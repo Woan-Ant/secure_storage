@@ -3,6 +3,8 @@
 [![style: very good analysis][very_good_analysis_badge]][very_good_analysis_link]
 [![License: MIT][license_badge]][license_link]
 
+Android · iOS · Web · macOS · Windows · Linux
+
 Encrypted key-value storage for Flutter, layering [Hive CE][hive_ce_link] boxes
 on top of [Flutter Secure Storage][fss_link].
 
@@ -23,25 +25,48 @@ flutter pub add secure_storage
 
 ### Platform setup
 
-This package inherits the platform requirements of its two dependencies:
+Runs on all six Flutter platforms. The requirements come from
+`flutter_secure_storage`, not from this package:
 
-| Platform | Requirement                                                   |
-| -------- | ------------------------------------------------------------- |
-| Android  | `minSdkVersion 24`, and `minSdkVersion 23` for `compileSdk`    |
-| iOS      | Keychain sharing capability if you sync between app extensions |
-| Web      | Boxes live in IndexedDB; `listUnencryptedKeys` returns `[]`    |
+| Platform | Requirement                                                       |
+| -------- | ----------------------------------------------------------------- |
+| Android  | `minSdk = 24`, and `compileSdk = 37` for `flutter_secure_storage` 11 |
+| iOS      | Deployment target 13.0                                            |
+| macOS    | Deployment target 10.15, with the Keychain Sharing capability     |
+| Web      | Boxes live in IndexedDB; `listUnencryptedKeys` returns `[]`       |
+
+On Android, set both in `android/app/build.gradle.kts`:
+
+```kotlin
+android {
+    compileSdk = 37
+    defaultConfig {
+        minSdk = 24
+    }
+}
+```
 
 ## Quick start 🚀
 
 ```dart
+import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:secure_storage/secure_storage.dart';
 
 final sl = GetIt.instance;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initSecureStorageFeature(sl: sl);
+
+  // This package does not depend on path_provider, so that it can also run on
+  // web. Resolving the directory is your app's job — on web Hive uses
+  // IndexedDB and there is no directory at all.
+  final storagePath = kIsWeb
+      ? null
+      : (await getApplicationDocumentsDirectory()).path;
+
+  initSecureStorageFeature(sl: sl, storagePath: storagePath);
 
   final storage = sl<SecureStorage>();
 
@@ -146,8 +171,9 @@ rather than a list so each adapter keeps its static type — Hive routes every
 write through an adapter registered as `TypeAdapter<dynamic>`.
 
 ```dart
-await initSecureStorageFeature(
+initSecureStorageFeature(
   sl: sl,
+  storagePath: storagePath,
   registerAdapters: (hive) => hive.registerAdapter(UserModelAdapter()),
 );
 ```
@@ -157,8 +183,9 @@ await initSecureStorageFeature(
 Nothing is logged by default. Pass a logger to see what the package is doing:
 
 ```dart
-await initSecureStorageFeature(
+initSecureStorageFeature(
   sl: sl,
+  storagePath: storagePath,
   logger: const DebugPrintSecureStorageLogger(),
 );
 ```
@@ -197,6 +224,7 @@ the pieces directly:
 final storage = SecureStorageImpl(
   hiveInterface: myHiveInstance,
   fSS: const FlutterSecureStorage(),
+  boxDirectoryPath: storagePath,
 );
 final repository = StorageRepositoryImpl(secureStorage: storage);
 final getData = GetDataUseCase(storageRepository: repository);
@@ -209,9 +237,11 @@ against a box and key you type in:
 
 ```sh
 cd example
-flutter create .   # generate the platform folders
-flutter run
+flutter run                 # Android or iOS
+flutter run -d chrome       # Web
 ```
+
+Android, iOS and Web are all set up and building.
 
 ## Running Tests 🧪
 

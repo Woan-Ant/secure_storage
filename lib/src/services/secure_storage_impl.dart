@@ -1,14 +1,12 @@
 import 'dart:convert';
-import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_ce/hive.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:secure_storage/src/core/error/app_exception.dart';
 import 'package:secure_storage/src/core/error/exception/secure_storage_exception.dart';
 import 'package:secure_storage/src/core/logger/secure_storage_logger.dart';
 import 'package:secure_storage/src/core/param/param_secure_storage.dart';
+import 'package:secure_storage/src/services/box_scanner/box_scanner.dart';
 import 'package:secure_storage/src/services/secure_storage.dart';
 import 'package:synchronized/synchronized.dart';
 
@@ -19,19 +17,25 @@ import 'package:synchronized/synchronized.dart';
 /// All public operations are serialised through a single lock, because a Hive
 /// box cannot be opened twice concurrently and every operation here opens and
 /// closes the box it touches.
+///
+/// `boxDirectoryPath` should be the same path `hiveInterface` was initialised
+/// with; it is what [listUnencryptedKeys] scans. Leave it unset on web.
 /// {@endtemplate}
 class SecureStorageImpl implements SecureStorage {
   /// {@macro secure_storage_impl}
   SecureStorageImpl({
     required HiveInterface hiveInterface,
     required FlutterSecureStorage fSS,
+    String? boxDirectoryPath,
     SecureStorageLogger logger = const SilentSecureStorageLogger(),
   }) : _hive = hiveInterface,
        _fSS = fSS,
+       _boxDirectoryPath = boxDirectoryPath,
        _logger = logger;
 
   final HiveInterface _hive;
   final FlutterSecureStorage _fSS;
+  final String? _boxDirectoryPath;
   final SecureStorageLogger _logger;
   final Lock _lock = Lock();
 
@@ -377,29 +381,16 @@ class SecureStorageImpl implements SecureStorage {
   }
 
   @override
-  Future<List<dynamic>> listUnencryptedKeys({
-    @visibleForTesting Directory? directory,
-  }) async {
-    if (kIsWeb) {
-      _logger.w('listUnencryptedKeys is not supported on web');
+  Future<List<dynamic>> listUnencryptedKeys() async {
+    final path = _boxDirectoryPath;
+    if (path == null) {
+      // Also the web case: boxes live in IndexedDB, so there is nothing to
+      // scan and callers pass no directory.
+      _logger.w('listUnencryptedKeys needs a boxDirectoryPath to scan');
       return [];
     }
     try {
-      final appDir = directory ?? await getApplicationDocumentsDirectory();
-      final allBoxNames = <String>[];
-
-      if (appDir.existsSync()) {
-        for (final file in appDir.listSync()) {
-          if (file is File && file.path.endsWith('.hive')) {
-            allBoxNames.add(
-              file.path
-                  .split(Platform.pathSeparator)
-                  .last
-                  .replaceAll('.hive', ''),
-            );
-          }
-        }
-      }
+      final allBoxNames = listBoxFileNames(path);
 
       // A box with no key in the keystore is an unencrypted one.
       final encryptedKeys = await _listEncryptedKeys();

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_ce/hive.dart';
@@ -6,7 +5,6 @@ import 'package:hive_ce/hive.dart';
 // an isolated Hive instance instead of mutating the global `Hive` singleton.
 // ignore: implementation_imports
 import 'package:hive_ce/src/hive_impl.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:secure_storage/src/core/logger/secure_storage_logger.dart';
 import 'package:secure_storage/src/data/repositories/storage_repository_impl.dart';
 import 'package:secure_storage/src/domain/repositories/storage_repository.dart';
@@ -24,9 +22,21 @@ import 'package:secure_storage/src/services/secure_storage_impl.dart';
 /// Call once during app start up, before the first storage access:
 ///
 /// ```dart
-/// await initSecureStorageFeature(sl: GetIt.instance);
+/// initSecureStorageFeature(
+///   sl: GetIt.instance,
+///   // On web Hive uses IndexedDB and this is ignored; elsewhere pass a
+///   // writable directory, typically from package:path_provider.
+///   storagePath: kIsWeb
+///       ? null
+///       : (await getApplicationDocumentsDirectory()).path,
+/// );
 /// final storage = GetIt.instance<SecureStorage>();
 /// ```
+///
+/// [storagePath] is where Hive keeps its box files and where
+/// [SecureStorage.listUnencryptedKeys] looks for them. This package does not
+/// depend on `path_provider`, so that it can also run on web — resolving the
+/// directory is the app's job.
 ///
 /// Registered under their abstract types: [HiveInterface],
 /// [FlutterSecureStorage], [SecureStorage], [StorageRepository], and the six
@@ -38,7 +48,7 @@ import 'package:secure_storage/src/services/secure_storage_impl.dart';
 /// would make Hive route every write through it:
 ///
 /// ```dart
-/// await initSecureStorageFeature(
+/// initSecureStorageFeature(
 ///   sl: sl,
 ///   registerAdapters: (hive) => hive.registerAdapter(UserModelAdapter()),
 /// );
@@ -49,20 +59,16 @@ import 'package:secure_storage/src/services/secure_storage_impl.dart';
 ///
 /// This creates a private Hive instance rather than touching the global `Hive`
 /// singleton, so it will not interfere with other Hive usage in the same app.
-Future<void> initSecureStorageFeature({
+void initSecureStorageFeature({
   required GetIt sl,
+  String? storagePath,
   void Function(HiveInterface hive)? registerAdapters,
   FlutterSecureStorage? secureStorage,
   SecureStorageLogger logger = const SilentSecureStorageLogger(),
-}) async {
-  // On web Hive uses IndexedDB, so there is no directory to point it at.
-  final hivePath = kIsWeb
-      ? ''
-      : (await getApplicationDocumentsDirectory()).path;
-
+}) {
   sl
     ..registerLazySingleton<HiveInterface>(() {
-      final hive = HiveImpl()..init(hivePath);
+      final hive = HiveImpl()..init(storagePath);
       registerAdapters?.call(hive);
       return hive;
     })
@@ -70,7 +76,12 @@ Future<void> initSecureStorageFeature({
       () => secureStorage ?? const FlutterSecureStorage(),
     )
     ..registerLazySingleton<SecureStorage>(
-      () => SecureStorageImpl(hiveInterface: sl(), fSS: sl(), logger: logger),
+      () => SecureStorageImpl(
+        hiveInterface: sl(),
+        fSS: sl(),
+        boxDirectoryPath: storagePath,
+        logger: logger,
+      ),
     )
     ..registerLazySingleton<StorageRepository>(
       () => StorageRepositoryImpl(secureStorage: sl()),

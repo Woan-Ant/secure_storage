@@ -6,7 +6,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:secure_storage/secure_storage.dart';
 
 class MockHive extends Mock implements HiveInterface {}
@@ -16,15 +15,6 @@ class MockFSS extends Mock implements FlutterSecureStorage {}
 class MockBox<T> extends Mock implements Box<T> {}
 
 class FakeHiveCipher extends Fake implements HiveCipher {}
-
-class _FakePathProvider extends PathProviderPlatform {
-  _FakePathProvider(this.path);
-
-  final String path;
-
-  @override
-  Future<String?> getApplicationDocumentsPath() async => path;
-}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -468,15 +458,19 @@ void main() {
 
   group('listUnencryptedKeys', () {
     late Directory tempDir;
+    late SecureStorageImpl scanning;
 
     setUp(() {
       tempDir = Directory.systemTemp.createTempSync('secure_storage_test');
-      File('${tempDir.path}${Platform.pathSeparator}auth.hive')
-          .writeAsStringSync('');
-      File('${tempDir.path}${Platform.pathSeparator}profile.hive')
-          .writeAsStringSync('');
-      File('${tempDir.path}${Platform.pathSeparator}notes.txt')
-          .writeAsStringSync('');
+      for (final name in ['auth.hive', 'profile.hive', 'notes.txt']) {
+        File('${tempDir.path}${Platform.pathSeparator}$name')
+            .writeAsStringSync('');
+      }
+      scanning = SecureStorageImpl(
+        hiveInterface: hive,
+        fSS: fss,
+        boxDirectoryPath: tempDir.path,
+      );
     });
 
     tearDown(() => tempDir.deleteSync(recursive: true));
@@ -484,43 +478,39 @@ void main() {
     test('returns the boxes that have no key in the keystore', () async {
       when(fss.readAll).thenAnswer((_) async => {'auth': encodedKey});
 
-      final result = await storage.listUnencryptedKeys(directory: tempDir);
-
-      expect(result, ['profile']);
+      expect(await scanning.listUnencryptedKeys(), ['profile']);
     });
 
     test('ignores files that are not hive boxes', () async {
       when(fss.readAll).thenAnswer((_) async => <String, String>{});
 
-      final result = await storage.listUnencryptedKeys(directory: tempDir);
-
-      expect(result, unorderedEquals(<String>['auth', 'profile']));
+      expect(
+        await scanning.listUnencryptedKeys(),
+        unorderedEquals(<String>['auth', 'profile']),
+      );
     });
 
     test('returns an empty list when the directory does not exist', () async {
       when(fss.readAll).thenAnswer((_) async => <String, String>{});
-
-      final result = await storage.listUnencryptedKeys(
-        directory: Directory('${tempDir.path}/missing'),
+      final missing = SecureStorageImpl(
+        hiveInterface: hive,
+        fSS: fss,
+        boxDirectoryPath: '${tempDir.path}${Platform.pathSeparator}missing',
       );
 
-      expect(result, isEmpty);
+      expect(await missing.listUnencryptedKeys(), isEmpty);
     });
 
-    test('falls back to the application documents directory', () async {
-      PathProviderPlatform.instance = _FakePathProvider(tempDir.path);
-      when(fss.readAll).thenAnswer((_) async => {'auth': encodedKey});
-
-      final result = await storage.listUnencryptedKeys();
-
-      expect(result, ['profile']);
+    test('returns an empty list when no directory was configured', () async {
+      expect(await storage.listUnencryptedKeys(), isEmpty);
+      verifyNever(fss.readAll);
     });
 
     test('propagates a keystore failure rather than masking it', () async {
       when(fss.readAll).thenThrow(Exception('keystore unavailable'));
 
       await expectLater(
-        storage.listUnencryptedKeys(directory: tempDir),
+        scanning.listUnencryptedKeys(),
         throwsA(isA<FSSReadException>()),
       );
     });

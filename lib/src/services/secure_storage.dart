@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:secure_storage/src/core/param/param_secure_storage.dart';
 
 /// {@template secure_storage}
@@ -50,9 +47,8 @@ abstract class SecureStorage {
 
   /// Returns the names of the Hive boxes on disk that have no encryption key.
   ///
-  /// Always returns an empty list on web, where boxes are not files.
-  /// [directory] is a test seam and should be left unset in production.
-  Future<List<dynamic>> listUnencryptedKeys({
-    @visibleForTesting Directory? directory,
-  });
+  /// Scans the directory the implementation was configured with. Returns an
+  /// empty list on web, where boxes live in IndexedDB rather than in files, and
+  /// when no directory was configured.
+  Future<List<dynamic>> listUnencryptedKeys();
 }

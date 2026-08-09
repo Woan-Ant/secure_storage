@@ -3,15 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:secure_storage/secure_storage.dart';
 
 class MockFSS extends Mock implements FlutterSecureStorage {}
-
-class _FakePathProvider extends PathProviderPlatform {
-  @override
-  Future<String?> getApplicationDocumentsPath() async => '/tmp/secure_storage';
-}
 
 class _Model {
   const _Model(this.value);
@@ -34,15 +28,12 @@ void main() {
 
   late GetIt sl;
 
-  setUp(() {
-    PathProviderPlatform.instance = _FakePathProvider();
-    sl = GetIt.asNewInstance();
-  });
+  setUp(() => sl = GetIt.asNewInstance());
 
   tearDown(() => sl.reset());
 
-  test('registers the service, the repository and every use case', () async {
-    await initSecureStorageFeature(sl: sl, secureStorage: MockFSS());
+  test('registers the service, the repository and every use case', () {
+    initSecureStorageFeature(sl: sl, secureStorage: MockFSS());
 
     expect(sl.isRegistered<HiveInterface>(), isTrue);
     expect(sl.isRegistered<FlutterSecureStorage>(), isTrue);
@@ -56,8 +47,8 @@ void main() {
     expect(sl<ListUnencryptedKeysUseCase>(), isNotNull);
   });
 
-  test('resolves the service as a singleton', () async {
-    await initSecureStorageFeature(sl: sl, secureStorage: MockFSS());
+  test('resolves the service as a singleton', () {
+    initSecureStorageFeature(sl: sl, secureStorage: MockFSS());
 
     expect(identical(sl<SecureStorage>(), sl<SecureStorage>()), isTrue);
   });
@@ -65,22 +56,21 @@ void main() {
   test('uses the injected FlutterSecureStorage instance', () async {
     final fss = MockFSS();
 
-    await initSecureStorageFeature(sl: sl, secureStorage: fss);
+    initSecureStorageFeature(sl: sl, secureStorage: fss);
 
     expect(identical(sl<FlutterSecureStorage>(), fss), isTrue);
   });
 
-  test('builds a Hive instance separate from the global singleton', () async {
-    await initSecureStorageFeature(sl: sl, secureStorage: MockFSS());
+  test('builds a Hive instance separate from the global singleton', () {
+    initSecureStorageFeature(sl: sl, secureStorage: MockFSS());
 
     expect(identical(sl<HiveInterface>(), Hive), isFalse);
   });
 
-  test('runs the adapter callback against the Hive instance it built',
-      () async {
+  test('runs the adapter callback against the Hive instance it built', () {
     final adapter = _ModelAdapter();
 
-    await initSecureStorageFeature(
+    initSecureStorageFeature(
       sl: sl,
       secureStorage: MockFSS(),
       registerAdapters: (hive) => hive.registerAdapter(adapter),
@@ -89,14 +79,14 @@ void main() {
     expect(sl<HiveInterface>().isAdapterRegistered(adapter.typeId), isTrue);
   });
 
-  test('registers no adapters when the callback is omitted', () async {
-    await initSecureStorageFeature(sl: sl, secureStorage: MockFSS());
+  test('registers no adapters when the callback is omitted', () {
+    initSecureStorageFeature(sl: sl, secureStorage: MockFSS());
 
     expect(sl<HiveInterface>().isAdapterRegistered(42), isFalse);
   });
 
-  test('passes the logger through to the service', () async {
-    await initSecureStorageFeature(
+  test('passes the logger through to the service', () {
+    initSecureStorageFeature(
       sl: sl,
       secureStorage: MockFSS(),
       logger: const DebugPrintSecureStorageLogger(),
