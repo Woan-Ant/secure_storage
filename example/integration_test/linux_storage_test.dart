@@ -43,6 +43,19 @@ void main() {
     }
   });
 
+  /// Skips the running test when no Secret Service is reachable.
+  ///
+  /// This has to be a run-time check: `testWidgets(skip:)` is evaluated when
+  /// the test is registered, which happens before [setUpAll] has probed.
+  bool needsKeystore() {
+    if (keystoreAvailable) return true;
+    markTestSkipped(
+      'no Secret Service available (install gnome-keyring, or enable KWallet '
+      'so ksecretd can provide org.kde.secretservicecompat)',
+    );
+    return false;
+  }
+
   setUp(() {
     tempDir = Directory.systemTemp.createTempSync('ss_integration');
     sl = GetIt.asNewInstance();
@@ -78,8 +91,9 @@ void main() {
       );
     });
 
-    testWidgets('writing an unencrypted box creates a real file',
-        (tester) async {
+    testWidgets('writing an unencrypted box creates a real file', (
+      tester,
+    ) async {
       await storage.storeData<String>(
         data: 'linux-plain',
         param: ParamStoreData(boxName: plainBox, dataKey: 'k'),
@@ -92,11 +106,11 @@ void main() {
         isTrue,
       );
     });
-
   });
 
   group('keystore backed', () {
     testWidgets('stores and reads back an encrypted value', (tester) async {
+      if (!needsKeystore()) return;
       await storage.storeData<String>(
         data: 'linux-secret',
         param: ParamStoreData(
@@ -112,9 +126,10 @@ void main() {
         ),
         'linux-secret',
       );
-    }, skip: !keystoreAvailable);
+    });
 
     testWidgets('the encrypted box file holds no plaintext', (tester) async {
+      if (!needsKeystore()) return;
       await storage.storeData<String>(
         data: 'linux-secret',
         param: ParamStoreData(
@@ -128,10 +143,12 @@ void main() {
         '${tempDir.path}${Platform.pathSeparator}$secretBox.hive',
       ).readAsBytesSync();
       expect(String.fromCharCodes(bytes), isNot(contains('linux-secret')));
-    }, skip: !keystoreAvailable);
+    });
 
-    testWidgets('lists encrypted and unencrypted boxes separately',
-        (tester) async {
+    testWidgets('lists encrypted and unencrypted boxes separately', (
+      tester,
+    ) async {
+      if (!needsKeystore()) return;
       await storage.storeData<String>(
         data: 'linux-secret',
         param: ParamStoreData(
@@ -150,11 +167,12 @@ void main() {
       expect(await storage.listEncryptedKeys(), contains(secretBox));
       expect(await storage.listUnencryptedKeys(), contains(plainBox));
       expect(await storage.listUnencryptedKeys(), isNot(contains(secretBox)));
-    }, skip: !keystoreAvailable);
+    });
 
     // Reads consult the keystore even for unencrypted boxes, because that is
     // how the box's encryption mode is determined.
     testWidgets('reads back an unencrypted value', (tester) async {
+      if (!needsKeystore()) return;
       await storage.storeData<String>(
         data: 'linux-plain',
         param: ParamStoreData(boxName: plainBox, dataKey: 'k'),
@@ -166,10 +184,12 @@ void main() {
         ),
         'linux-plain',
       );
-    }, skip: !keystoreAvailable);
+    });
 
-    testWidgets('deleting the last entry removes box and keyring entry',
-        (tester) async {
+    testWidgets('deleting the last entry removes box and keyring entry', (
+      tester,
+    ) async {
+      if (!needsKeystore()) return;
       await storage.storeData<String>(
         data: 'linux-secret',
         param: ParamStoreData(
@@ -190,6 +210,6 @@ void main() {
         isFalse,
       );
       expect(await storage.listEncryptedKeys(), isNot(contains(secretBox)));
-    }, skip: !keystoreAvailable);
+    });
   });
 }

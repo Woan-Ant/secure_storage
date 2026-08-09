@@ -48,8 +48,15 @@ generated CMake files pointing at deleted paths.
   `compileSdk = 37`, both required by `flutter_secure_storage` 11.
 - **iOS** — deployment target 13.0.
 - **Linux** — needs `libsecret-1` and GTK3 to build, and a running Secret
-  Service (gnome-keyring, or KWallet's `ksecretd`) at runtime. The integration
-  test skips its keystore-backed cases when none is available.
+  Service at runtime. The integration test skips its keystore-backed cases when
+  none is available, so the suite stays honest instead of failing.
+
+  If you hit `secret_service_get_sync: The name is not activatable`, nothing on
+  the session bus is providing the Secret Service. Either install
+  `gnome-keyring`, or use KWallet: set `Enabled=true` in `~/.config/kwalletrc`,
+  then make sure `ksecretd` is actually running. Note that `ksecretd` exits
+  immediately if started attached to a terminal — a desktop session normally
+  launches it via D-Bus activation.
 - **Web** — `storagePath` is `null` and Hive stores boxes in IndexedDB.
   `listUnencryptedKeys` enumerates those databases, so it works here too —
   except on Firefox, which lacks `indexedDB.databases()`.
