@@ -2,9 +2,12 @@ import 'dart:io';
 
 /// Returns the name of every Hive box file directly inside [directoryPath].
 ///
-/// The `.hive` suffix is stripped, so `auth.hive` comes back as `auth`. A
-/// directory that does not exist yields an empty list rather than throwing.
-List<String> listBoxFileNames(String directoryPath) {
+/// The `.hive` suffix is stripped, so `auth.hive` comes back as `auth`. A null
+/// path, or a directory that does not exist, yields an empty list rather than
+/// throwing.
+Future<List<String>> listBoxNames(String? directoryPath) async {
+  if (directoryPath == null) return const [];
+
   final directory = Directory(directoryPath);
   if (!directory.existsSync()) return const [];
 

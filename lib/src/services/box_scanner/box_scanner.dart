@@ -1,4 +1,4 @@
-/// Resolves `listBoxFileNames` to the implementation for the target platform.
+/// Resolves `listBoxNames` to the implementation for the target platform.
 ///
 /// Keeping the `dart:io` usage behind this conditional export is what lets the
 /// package run — and be listed as supported — on web.

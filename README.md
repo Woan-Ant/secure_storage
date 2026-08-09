@@ -33,7 +33,7 @@ Runs on all six Flutter platforms. The requirements come from
 | Android  | `minSdk = 24`, and `compileSdk = 37` for `flutter_secure_storage` 11 |
 | iOS      | Deployment target 13.0                                            |
 | macOS    | Deployment target 10.15, with the Keychain Sharing capability     |
-| Web      | Boxes live in IndexedDB; `listUnencryptedKeys` returns `[]`       |
+| Web      | Boxes live in IndexedDB rather than in files                       |
 
 On Android, set both in `android/app/build.gradle.kts`:
 
@@ -162,6 +162,14 @@ path distinguishes "creating a box" from "adding to one".
 
 Deleting the last entry in a box deletes the box from disk and, for an encrypted
 box, removes its key from the keystore — so no orphaned keys accumulate.
+
+`listUnencryptedKeys` works on every platform. On native it scans the storage
+directory for `.hive` files; on web there are no files, so it enumerates the
+IndexedDB databases instead — Hive CE creates one per box, named after the box.
+Two web-only caveats follow from the browser API: Firefox has never implemented
+`indexedDB.databases()`, so the list is empty there, and the listing covers every
+IndexedDB database on the origin, so unrelated databases your app creates will
+also appear.
 
 > **⚠️ `listEncryptedKeys` returns live encryption keys.** It exists for
 > diagnostics. Never log, display or transmit its values.

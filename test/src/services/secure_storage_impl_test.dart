@@ -545,8 +545,10 @@ void main() {
     });
 
     test('returns an empty list when no directory was configured', () async {
+      when(fss.readAll).thenAnswer((_) async => <String, String>{});
+
+      // There is nothing to scan, so no box can be reported as unencrypted.
       expect(await storage.listUnencryptedKeys(), isEmpty);
-      verifyNever(fss.readAll);
     });
 
     test('propagates a keystore failure rather than masking it', () async {

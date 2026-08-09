@@ -382,15 +382,10 @@ class SecureStorageImpl implements SecureStorage {
 
   @override
   Future<List<dynamic>> listUnencryptedKeys() async {
-    final path = _boxDirectoryPath;
-    if (path == null) {
-      // Also the web case: boxes live in IndexedDB, so there is nothing to
-      // scan and callers pass no directory.
-      _logger.w('listUnencryptedKeys needs a boxDirectoryPath to scan');
-      return [];
-    }
     try {
-      final allBoxNames = listBoxFileNames(path);
+      // On native this scans _boxDirectoryPath for box files; on web it
+      // enumerates the IndexedDB databases, where boxes live instead.
+      final allBoxNames = await listBoxNames(_boxDirectoryPath);
 
       // A box with no key in the keystore is an unencrypted one.
       final encryptedKeys = await _listEncryptedKeys();

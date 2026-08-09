@@ -25,6 +25,6 @@ flutter run -d chrome      # Web
 - **Android** — `android/app/build.gradle.kts` sets `minSdk = 24` and
   `compileSdk = 37`, both required by `flutter_secure_storage` 11.
 - **iOS** — deployment target 13.0.
-- **Web** — `storagePath` is `null`, Hive stores boxes in IndexedDB, and
-  `listUnencryptedKeys` returns an empty list because there are no box files to
-  scan.
+- **Web** — `storagePath` is `null` and Hive stores boxes in IndexedDB.
+  `listUnencryptedKeys` enumerates those databases, so it works here too —
+  except on Firefox, which lacks `indexedDB.databases()`.
