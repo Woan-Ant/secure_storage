@@ -1,0 +1,9 @@
+include: package:very_good_analysis/analysis_options.yaml
+
+linter:
+  rules:
+    # Every class here takes a public named parameter and assigns it to a
+    # private final field. An initializing formal cannot express that, because
+    # Dart forbids private named parameters (`this._foo` in a `{}` list is a
+    # compile error), so the lint has no valid fix at these call sites.
+    prefer_initializing_formals: false

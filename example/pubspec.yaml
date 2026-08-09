@@ -1,0 +1,26 @@
+name: secure_storage_example
+description: Demonstrates reading, writing and deleting encrypted entries with the secure_storage package.
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.12.0
+  flutter: ">=3.44.0"
+
+dependencies:
+  bloc: ^9.0.0
+  equatable: ^2.0.0
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.0.0
+  get_it: ^9.0.0
+  secure_storage:
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^10.3.0
+
+flutter:
+  uses-material-design: true

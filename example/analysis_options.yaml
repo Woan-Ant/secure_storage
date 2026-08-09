@@ -1,0 +1,8 @@
+include: package:very_good_analysis/analysis_options.yaml
+
+linter:
+  rules:
+    # The bloc takes public named parameters and assigns them to private final
+    # fields; an initializing formal cannot express that, because Dart forbids
+    # private named parameters.
+    prefer_initializing_formals: false
