@@ -435,6 +435,25 @@ void main() {
     });
 
     test(
+      'throws FSSReadException when the keystore itself is unavailable',
+      () async {
+        // Reproduces desktop Linux with no Secret Service running: the plugin
+        // throws from containsKey, and it must not escape untyped.
+        when(() => hive.boxExists(boxName)).thenAnswer((_) async => true);
+        when(
+          () => fss.containsKey(key: boxName),
+        ).thenThrow(Exception('Libsecret error: name is not activatable'));
+
+        await expectLater(
+          storage.isDataExist(
+            param: ParamCheckData(boxName: boxName, dataKey: 'token'),
+          ),
+          throwsA(isA<FSSReadException>()),
+        );
+      },
+    );
+
+    test(
       'throws HiveOpenBoxException when hive refuses to open the box',
       () async {
         when(() => hive.boxExists(boxName)).thenAnswer((_) async => true);

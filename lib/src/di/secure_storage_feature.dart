@@ -28,7 +28,7 @@ import 'package:secure_storage/src/services/secure_storage_impl.dart';
 ///   // writable directory, typically from package:path_provider.
 ///   storagePath: kIsWeb
 ///       ? null
-///       : (await getApplicationDocumentsDirectory()).path,
+///       : (await getApplicationSupportDirectory()).path,
 /// );
 /// final storage = GetIt.instance<SecureStorage>();
 /// ```

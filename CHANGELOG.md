@@ -22,6 +22,9 @@ Initial release. Runs on Android, iOS, Web, macOS, Windows and Linux.
 - Pluggable `SecureStorageLogger`; silent by default, and never emits encryption
   keys or stored values.
 
+Keystore failures are now always reported as `FSSReadException` rather than
+letting the platform channel's own exception escape untyped.
+
 `listUnencryptedKeys` works on every platform: it scans the storage directory on
 native and enumerates IndexedDB databases on web. It returns an empty list on
 Firefox, which does not implement `indexedDB.databases()`.

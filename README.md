@@ -33,7 +33,16 @@ Runs on all six Flutter platforms. The requirements come from
 | Android  | `minSdk = 24`, and `compileSdk = 37` for `flutter_secure_storage` 11 |
 | iOS      | Deployment target 13.0                                            |
 | macOS    | Deployment target 10.15, with the Keychain Sharing capability     |
+| Linux    | `libsecret-1` ≥ 0.18.4 and GTK3 at build time, **and a running Secret Service** at runtime |
 | Web      | Boxes live in IndexedDB rather than in files                       |
+
+On desktop Linux there is no OS keystore by default. `flutter_secure_storage`
+talks to a Secret Service provider over D-Bus — `gnome-keyring`, or KWallet via
+`ksecretd`. If none is running, every operation that consults the keystore fails
+with `FSSReadException` or `FSSWriteException`. That includes reads of
+*unencrypted* boxes, because the keystore is what tells the package whether a
+box is encrypted. Only the first write to a new unencrypted box succeeds
+without it.
 
 On Android, set both in `android/app/build.gradle.kts`:
 
@@ -64,7 +73,7 @@ Future<void> main() async {
   // IndexedDB and there is no directory at all.
   final storagePath = kIsWeb
       ? null
-      : (await getApplicationDocumentsDirectory()).path;
+      : (await getApplicationSupportDirectory()).path;
 
   initSecureStorageFeature(sl: sl, storagePath: storagePath);
 
@@ -84,6 +93,13 @@ Future<void> main() async {
   );
 }
 ```
+
+Prefer `getApplicationSupportDirectory()` over
+`getApplicationDocumentsDirectory()`. Boxes are app-private data, and on desktop
+the documents directory is the user's own visible folder. On Linux it matters
+twice over: the documents lookup shells out to the `xdg-user-dir` binary and
+throws `MissingPlatformDirectoryException` when it is absent, while the support
+directory is derived from `XDG_DATA_HOME` and created for you.
 
 ## Two ways to use it
 

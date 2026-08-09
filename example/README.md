@@ -10,7 +10,29 @@ flutter pub get
 
 flutter run                # Android or iOS device / emulator
 flutter run -d chrome      # Web
+flutter run -d linux       # Linux desktop
 ```
+
+Integration tests against the real plugin and real Hive files:
+
+```sh
+flutter test integration_test -d linux
+```
+
+## Troubleshooting
+
+**`CMake Error ... file INSTALL cannot find .../build/native_assets/linux`**
+
+Stale CMake state, usually after the `build/` directory was removed by hand.
+The generated `cmake_install.cmake` still refers to a path that no longer
+exists. Fix it with:
+
+```sh
+flutter clean && flutter pub get
+```
+
+Use `flutter clean` rather than `rm -rf build` — the latter leaves the
+generated CMake files pointing at deleted paths.
 
 ## What to look at
 
@@ -25,6 +47,9 @@ flutter run -d chrome      # Web
 - **Android** — `android/app/build.gradle.kts` sets `minSdk = 24` and
   `compileSdk = 37`, both required by `flutter_secure_storage` 11.
 - **iOS** — deployment target 13.0.
+- **Linux** — needs `libsecret-1` and GTK3 to build, and a running Secret
+  Service (gnome-keyring, or KWallet's `ksecretd`) at runtime. The integration
+  test skips its keystore-backed cases when none is available.
 - **Web** — `storagePath` is `null` and Hive stores boxes in IndexedDB.
   `listUnencryptedKeys` enumerates those databases, so it works here too —
   except on Firefox, which lacks `indexedDB.databases()`.

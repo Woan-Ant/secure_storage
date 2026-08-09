@@ -16,9 +16,14 @@ Future<void> main() async {
   // The package deliberately does not depend on path_provider, so that it can
   // also run on web. Resolving the directory is the app's job: on web Hive
   // uses IndexedDB and there is no directory at all.
+  //
+  // Application *support*, not documents: this is app-private data, and on
+  // desktop the documents directory is the user's own visible folder. On Linux
+  // it is also the more robust choice, because the documents lookup shells out
+  // to the `xdg-user-dir` binary, which is not always installed.
   final storagePath = kIsWeb
       ? null
-      : (await getApplicationDocumentsDirectory()).path;
+      : (await getApplicationSupportDirectory()).path;
 
   // One call registers the service, the repository and all six use cases.
   initSecureStorageFeature(

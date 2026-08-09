@@ -172,7 +172,15 @@ class SecureStorageImpl implements SecureStorage {
       return (exist: boxExists, encrypted: null);
     }
     // A key held for this box name is what makes the box an encrypted one.
-    final fssKey = await _fSS.containsKey(key: boxName);
+    final bool fssKey;
+    try {
+      fssKey = await _fSS.containsKey(key: boxName);
+    } on Exception catch (e) {
+      // Without this the platform channel's own exception would escape
+      // untyped, bypassing the package's error model.
+      _logger.e('🛡️ [flutterSecureStorage.containsKey]', error: e);
+      throw FSSReadException();
+    }
     final box = await _openBox<dynamic>(
       boxName: boxName,
       dataKey: dataKey,
