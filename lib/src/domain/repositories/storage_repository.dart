@@ -1,4 +1,4 @@
-import 'package:fpdart/fpdart.dart';
+import 'package:dartz/dartz.dart';
 import 'package:secure_storage/src/core/error/app_failure.dart';
 import 'package:secure_storage/src/core/param/param_secure_storage.dart';
 

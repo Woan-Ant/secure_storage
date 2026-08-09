@@ -12,6 +12,10 @@ class FakeParamStoreData extends Fake implements ParamStoreData {}
 
 class FakeParamDeleteData extends Fake implements ParamDeleteData {}
 
+/// dartz has no `getLeft()`, so swap the sides and take the resulting Option.
+Failure? leftOf(Either<Failure, dynamic> result) =>
+    result.swap().toOption().toNullable();
+
 void main() {
   late MockSecureStorage service;
   late StorageRepositoryImpl repository;
@@ -35,38 +39,41 @@ void main() {
 
   group('checkData', () {
     test('returns the service result on the right', () async {
-      when(() => service.isDataExist(param: any(named: 'param')))
-          .thenAnswer((_) async => (exist: true, encrypted: true));
+      when(
+        () => service.isDataExist(param: any(named: 'param')),
+      ).thenAnswer((_) async => (exist: true, encrypted: true));
 
       final result = await repository.checkData(param: checkParam);
 
       expect(result.isRight(), isTrue);
       expect(
-        result.getOrElse((_) => (exist: false, encrypted: null)).exist,
+        result.getOrElse(() => (exist: false, encrypted: null)).exist,
         isTrue,
       );
     });
 
     test('converts an AppException into its matching Failure', () async {
-      when(() => service.isDataExist(param: any(named: 'param')))
-          .thenThrow(HiveOpenBoxException());
+      when(
+        () => service.isDataExist(param: any(named: 'param')),
+      ).thenThrow(HiveOpenBoxException());
 
       final result = await repository.checkData(param: checkParam);
 
       expect(result.isLeft(), isTrue);
       expect(
-        result.getLeft().toNullable(),
+        leftOf(result),
         isA<OpenFailure>().having((f) => f.code, 'code', '004'),
       );
     });
 
     test('wraps an unmodelled exception in an UnhandledFailure', () async {
-      when(() => service.isDataExist(param: any(named: 'param')))
-          .thenThrow(const FormatException('bad input'));
+      when(
+        () => service.isDataExist(param: any(named: 'param')),
+      ).thenThrow(const FormatException('bad input'));
 
       final result = await repository.checkData(param: checkParam);
 
-      expect(result.getLeft().toNullable(), isA<UnhandledFailure>());
+      expect(leftOf(result), isA<UnhandledFailure>());
     });
   });
 
@@ -84,7 +91,7 @@ void main() {
         data: 'token-value',
       );
 
-      expect(result.getOrElse((_) => ''), contains('String'));
+      expect(result.getOrElse(() => ''), contains('String'));
     });
 
     test('converts a write failure', () async {
@@ -97,56 +104,61 @@ void main() {
 
       final result = await repository.storeData(param: storeParam, data: 'x');
 
-      expect(result.getLeft().toNullable(), isA<HiveWriteFailure>());
+      expect(leftOf(result), isA<HiveWriteFailure>());
     });
   });
 
   group('getData', () {
     test('returns the stored value', () async {
-      when(() => service.getData<Object>(param: any(named: 'param')))
-          .thenAnswer((_) async => 'token-value');
+      when(
+        () => service.getData<Object>(param: any(named: 'param')),
+      ).thenAnswer((_) async => 'token-value');
 
       final result = await repository.getData(param: getParam);
 
-      expect(result.getOrElse((_) => ''), 'token-value');
+      expect(result.getOrElse(() => ''), 'token-value');
     });
 
     test('reports a null value as DataDoesNotExistFailure', () async {
-      when(() => service.getData<Object>(param: any(named: 'param')))
-          .thenAnswer((_) async => null);
+      when(
+        () => service.getData<Object>(param: any(named: 'param')),
+      ).thenAnswer((_) async => null);
 
       final result = await repository.getData(param: getParam);
 
-      expect(result.getLeft().toNullable(), isA<DataDoesNotExistFailure>());
+      expect(leftOf(result), isA<DataDoesNotExistFailure>());
     });
 
     test('converts a missing entry', () async {
-      when(() => service.getData<Object>(param: any(named: 'param')))
-          .thenThrow(DataDoesNotExistException());
+      when(
+        () => service.getData<Object>(param: any(named: 'param')),
+      ).thenThrow(DataDoesNotExistException());
 
       final result = await repository.getData(param: getParam);
 
-      expect(result.getLeft().toNullable(), isA<DataDoesNotExistFailure>());
+      expect(leftOf(result), isA<DataDoesNotExistFailure>());
     });
   });
 
   group('deleteData', () {
     test('names the deleted key on success', () async {
-      when(() => service.deleteData<Object>(param: any(named: 'param')))
-          .thenAnswer((_) async {});
+      when(
+        () => service.deleteData<Object>(param: any(named: 'param')),
+      ).thenAnswer((_) async {});
 
       final result = await repository.deleteData(param: deleteParam);
 
-      expect(result.getOrElse((_) => ''), contains('auth_token'));
+      expect(result.getOrElse(() => ''), contains('auth_token'));
     });
 
     test('converts a delete failure', () async {
-      when(() => service.deleteData<Object>(param: any(named: 'param')))
-          .thenThrow(HiveDeleteBoxException());
+      when(
+        () => service.deleteData<Object>(param: any(named: 'param')),
+      ).thenThrow(HiveDeleteBoxException());
 
       final result = await repository.deleteData(param: deleteParam);
 
-      expect(result.getLeft().toNullable(), isA<HiveDeleteBoxFailure>());
+      expect(leftOf(result), isA<HiveDeleteBoxFailure>());
     });
   });
 
@@ -156,7 +168,7 @@ void main() {
 
       final result = await repository.listEncryptedKeys();
 
-      expect(result.getOrElse((_) => {}), {'auth': 'k'});
+      expect(result.getOrElse(() => {}), {'auth': 'k'});
     });
 
     test('converts a keystore read failure', () async {
@@ -164,16 +176,17 @@ void main() {
 
       final result = await repository.listEncryptedKeys();
 
-      expect(result.getLeft().toNullable(), isA<FSSReadFailure>());
+      expect(leftOf(result), isA<FSSReadFailure>());
     });
 
     test('returns the unencrypted box names', () async {
-      when(() => service.listUnencryptedKeys())
-          .thenAnswer((_) async => ['profile']);
+      when(
+        () => service.listUnencryptedKeys(),
+      ).thenAnswer((_) async => ['profile']);
 
       final result = await repository.listUnencryptedKeys();
 
-      expect(result.getOrElse((_) => []), ['profile']);
+      expect(result.getOrElse(() => []), ['profile']);
     });
 
     test('converts a hive read failure', () async {
@@ -181,7 +194,7 @@ void main() {
 
       final result = await repository.listUnencryptedKeys();
 
-      expect(result.getLeft().toNullable(), isA<HiveReadFailure>());
+      expect(leftOf(result), isA<HiveReadFailure>());
     });
   });
 }

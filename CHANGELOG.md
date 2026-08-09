@@ -13,8 +13,9 @@ Initial release. Runs on Android, iOS, Web, macOS, Windows and Linux.
   under its box.
 - Typed exceptions for every failure mode, each mapping to a matching `Failure`
   value.
-- `StorageRepository` and six use cases returning `Either<Failure, T>` for
-  callers who prefer not to catch.
+- `StorageRepository` and six use cases returning dartz `Either<Failure, T>`
+  for callers who prefer not to catch. `Either`, `Left` and `Right` are
+  re-exported, so consumers need not depend on dartz directly.
 - `initSecureStorageFeature` to register the whole feature into a `get_it`
   container, with hooks for Hive type adapters, a substitute
   `FlutterSecureStorage`, and a logger.

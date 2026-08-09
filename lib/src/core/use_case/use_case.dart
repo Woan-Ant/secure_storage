@@ -1,5 +1,5 @@
+import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
-import 'package:fpdart/fpdart.dart';
 import 'package:secure_storage/src/core/error/app_failure.dart';
 
 /// {@template use_case}

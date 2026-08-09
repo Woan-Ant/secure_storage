@@ -6,7 +6,7 @@
 /// `initSecureStorageFeature` wires all of it into a `GetIt` container.
 library;
 
-export 'package:fpdart/fpdart.dart' show Either, Left, Right;
+export 'package:dartz/dartz.dart' show Either, Left, Right;
 
 export 'src/core/error/app_exception.dart';
 export 'src/core/error/app_failure.dart';

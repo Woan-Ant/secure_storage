@@ -105,7 +105,9 @@ try {
 ### The repository and use cases — return `Either`
 
 `StorageRepository` wraps the service and converts every exception into a
-`Failure` value, so nothing throws:
+`Failure` value, so nothing throws. The `Either` is [dartz][dartz_link]'s, and
+this package re-exports `Either`, `Left` and `Right` so you do not need to add
+dartz to your own pubspec:
 
 ```dart
 final result = await sl<GetDataUseCase>()(
@@ -257,6 +259,7 @@ genhtml coverage/lcov.info -o coverage/
 open coverage/index.html
 ```
 
+[dartz_link]: https://pub.dev/packages/dartz
 [flutter_install_link]: https://docs.flutter.dev/get-started/install
 [fss_link]: https://pub.dev/packages/flutter_secure_storage
 [hive_ce_link]: https://pub.dev/packages/hive_ce

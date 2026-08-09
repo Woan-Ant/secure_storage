@@ -79,8 +79,10 @@ void main() {
     });
 
     test('ParamStoreData defaults to unencrypted', () {
-      expect(ParamStoreData(boxName: 'auth', dataKey: 'token').encrypted,
-          isFalse);
+      expect(
+        ParamStoreData(boxName: 'auth', dataKey: 'token').encrypted,
+        isFalse,
+      );
     });
 
     test('ParamDeleteData compares by box and key', () {

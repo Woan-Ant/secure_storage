@@ -48,8 +48,12 @@ void main() {
       when(() => box.isNotEmpty).thenReturn(false);
     }
     when(() => hive.generateSecureKey()).thenReturn(secureKey);
-    when(() => fss.write(key: any(named: 'key'), value: any(named: 'value')))
-        .thenAnswer((_) async {});
+    when(
+      () => fss.write(
+        key: any(named: 'key'),
+        value: any(named: 'value'),
+      ),
+    ).thenAnswer((_) async {});
     when(() => fss.delete(key: any(named: 'key'))).thenAnswer((_) async {});
     when(
       () => fss.read(key: any(named: 'key')),
@@ -81,10 +85,12 @@ void main() {
         ),
       ).thenAnswer((_) async => stringBox);
     } else {
-      when(() => hive.openBox<dynamic>(boxName))
-          .thenAnswer((_) async => dynamicBox);
-      when(() => hive.openBox<String>(boxName))
-          .thenAnswer((_) async => stringBox);
+      when(
+        () => hive.openBox<dynamic>(boxName),
+      ).thenAnswer((_) async => dynamicBox);
+      when(
+        () => hive.openBox<String>(boxName),
+      ).thenAnswer((_) async => stringBox);
     }
   }
 
@@ -101,18 +107,20 @@ void main() {
       verifyNever(() => hive.openBox<dynamic>(any()));
     });
 
-    test('reports the key and the encryption mode when the box exists',
-        () async {
-      stubCheckData(boxExists: true, keyExists: true, encrypted: true);
+    test(
+      'reports the key and the encryption mode when the box exists',
+      () async {
+        stubCheckData(boxExists: true, keyExists: true, encrypted: true);
 
-      final result = await storage.isDataExist(
-        param: ParamCheckData(boxName: boxName, dataKey: 'token'),
-      );
+        final result = await storage.isDataExist(
+          param: ParamCheckData(boxName: boxName, dataKey: 'token'),
+        );
 
-      expect(result.exist, isTrue);
-      expect(result.encrypted, isTrue);
-      verify(dynamicBox.close).called(1);
-    });
+        expect(result.exist, isTrue);
+        expect(result.encrypted, isTrue);
+        verify(dynamicBox.close).called(1);
+      },
+    );
 
     test('reports a missing key inside an existing box', () async {
       stubCheckData(boxExists: true);
@@ -127,53 +135,64 @@ void main() {
   });
 
   group('storeData on a new box', () {
-    test('generates a key, stores it in the keystore and encrypts the box',
-        () async {
-      stubCheckData(boxExists: false);
-      when(
-        () => hive.openBox<String>(
-          boxName,
-          encryptionCipher: any(named: 'encryptionCipher'),
-        ),
-      ).thenAnswer((_) async => stringBox);
-      when(() => stringBox.put(dataKey, 'value')).thenAnswer((_) async {});
+    test(
+      'generates a key, stores it in the keystore and encrypts the box',
+      () async {
+        stubCheckData(boxExists: false);
+        when(
+          () => hive.openBox<String>(
+            boxName,
+            encryptionCipher: any(named: 'encryptionCipher'),
+          ),
+        ).thenAnswer((_) async => stringBox);
+        when(() => stringBox.put(dataKey, 'value')).thenAnswer((_) async {});
 
-      await storage.storeData<String>(
-        data: 'value',
-        param: ParamStoreData(
-          boxName: boxName,
-          dataKey: 'token',
-          encrypted: true,
-        ),
-      );
+        await storage.storeData<String>(
+          data: 'value',
+          param: ParamStoreData(
+            boxName: boxName,
+            dataKey: 'token',
+            encrypted: true,
+          ),
+        );
 
-      verify(() => hive.generateSecureKey()).called(1);
-      verify(() => fss.write(key: boxName, value: encodedKey)).called(1);
-      verify(() => stringBox.put(dataKey, 'value')).called(1);
-      verify(stringBox.close).called(1);
-    });
+        verify(() => hive.generateSecureKey()).called(1);
+        verify(() => fss.write(key: boxName, value: encodedKey)).called(1);
+        verify(() => stringBox.put(dataKey, 'value')).called(1);
+        verify(stringBox.close).called(1);
+      },
+    );
 
-    test('skips key generation when the caller asks for no encryption',
-        () async {
-      stubCheckData(boxExists: false);
-      when(() => stringBox.put(dataKey, 'value')).thenAnswer((_) async {});
+    test(
+      'skips key generation when the caller asks for no encryption',
+      () async {
+        stubCheckData(boxExists: false);
+        when(() => stringBox.put(dataKey, 'value')).thenAnswer((_) async {});
 
-      await storage.storeData<String>(
-        data: 'value',
-        param: ParamStoreData(boxName: boxName, dataKey: 'token'),
-      );
+        await storage.storeData<String>(
+          data: 'value',
+          param: ParamStoreData(boxName: boxName, dataKey: 'token'),
+        );
 
-      verifyNever(() => hive.generateSecureKey());
-      verifyNever(
-        () => fss.write(key: any(named: 'key'), value: any(named: 'value')),
-      );
-      verify(() => hive.openBox<String>(boxName)).called(1);
-    });
+        verifyNever(() => hive.generateSecureKey());
+        verifyNever(
+          () => fss.write(
+            key: any(named: 'key'),
+            value: any(named: 'value'),
+          ),
+        );
+        verify(() => hive.openBox<String>(boxName)).called(1);
+      },
+    );
 
     test('throws FSSWriteException when the keystore write fails', () async {
       stubCheckData(boxExists: false);
-      when(() => fss.write(key: any(named: 'key'), value: any(named: 'value')))
-          .thenThrow(Exception('keystore unavailable'));
+      when(
+        () => fss.write(
+          key: any(named: 'key'),
+          value: any(named: 'value'),
+        ),
+      ).thenThrow(Exception('keystore unavailable'));
 
       await expectLater(
         storage.storeData<String>(
@@ -190,40 +209,45 @@ void main() {
   });
 
   group('storeData on an existing box', () {
-    test('keeps the box encrypted even when the param says otherwise',
-        () async {
-      stubCheckData(boxExists: true, keyExists: true, encrypted: true);
-      when(() => stringBox.put(dataKey, 'value')).thenAnswer((_) async {});
+    test(
+      'keeps the box encrypted even when the param says otherwise',
+      () async {
+        stubCheckData(boxExists: true, keyExists: true, encrypted: true);
+        when(() => stringBox.put(dataKey, 'value')).thenAnswer((_) async {});
 
-      await storage.storeData<String>(
-        data: 'value',
-        param: ParamStoreData(boxName: boxName, dataKey: 'token'),
-      );
-
-      verifyNever(() => hive.generateSecureKey());
-      verify(
-        () => hive.openBox<String>(
-          boxName,
-          encryptionCipher: any(named: 'encryptionCipher'),
-        ),
-      ).called(1);
-    });
-
-    test('throws HiveWriteException and still closes the box on put failure',
-        () async {
-      stubCheckData(boxExists: true, keyExists: true);
-      when(() => stringBox.put(dataKey, 'value'))
-          .thenThrow(Exception('disk full'));
-
-      await expectLater(
-        storage.storeData<String>(
+        await storage.storeData<String>(
           data: 'value',
           param: ParamStoreData(boxName: boxName, dataKey: 'token'),
-        ),
-        throwsA(isA<HiveWriteException>()),
-      );
-      verify(stringBox.close).called(1);
-    });
+        );
+
+        verifyNever(() => hive.generateSecureKey());
+        verify(
+          () => hive.openBox<String>(
+            boxName,
+            encryptionCipher: any(named: 'encryptionCipher'),
+          ),
+        ).called(1);
+      },
+    );
+
+    test(
+      'throws HiveWriteException and still closes the box on put failure',
+      () async {
+        stubCheckData(boxExists: true, keyExists: true);
+        when(
+          () => stringBox.put(dataKey, 'value'),
+        ).thenThrow(Exception('disk full'));
+
+        await expectLater(
+          storage.storeData<String>(
+            data: 'value',
+            param: ParamStoreData(boxName: boxName, dataKey: 'token'),
+          ),
+          throwsA(isA<HiveWriteException>()),
+        );
+        verify(stringBox.close).called(1);
+      },
+    );
   });
 
   group('getData', () {
@@ -304,31 +328,35 @@ void main() {
       verifyNever(() => fss.delete(key: any(named: 'key')));
     });
 
-    test('also removes the keystore entry for an emptied encrypted box',
-        () async {
-      stubCheckData(boxExists: true, keyExists: true, encrypted: true);
-      when(() => stringBox.delete(dataKey)).thenAnswer((_) async {});
-      when(stringBox.deleteFromDisk).thenAnswer((_) async {});
+    test(
+      'also removes the keystore entry for an emptied encrypted box',
+      () async {
+        stubCheckData(boxExists: true, keyExists: true, encrypted: true);
+        when(() => stringBox.delete(dataKey)).thenAnswer((_) async {});
+        when(stringBox.deleteFromDisk).thenAnswer((_) async {});
 
-      await storage.deleteData<String>(
-        param: ParamDeleteData(boxName: boxName, dataKey: 'token'),
-      );
-
-      verify(stringBox.deleteFromDisk).called(1);
-      verify(() => fss.delete(key: boxName)).called(1);
-    });
-
-    test('throws DataDoesNotExistException when there is nothing to delete',
-        () async {
-      stubCheckData(boxExists: false);
-
-      await expectLater(
-        storage.deleteData<String>(
+        await storage.deleteData<String>(
           param: ParamDeleteData(boxName: boxName, dataKey: 'token'),
-        ),
-        throwsA(isA<DataDoesNotExistException>()),
-      );
-    });
+        );
+
+        verify(stringBox.deleteFromDisk).called(1);
+        verify(() => fss.delete(key: boxName)).called(1);
+      },
+    );
+
+    test(
+      'throws DataDoesNotExistException when there is nothing to delete',
+      () async {
+        stubCheckData(boxExists: false);
+
+        await expectLater(
+          storage.deleteData<String>(
+            param: ParamDeleteData(boxName: boxName, dataKey: 'token'),
+          ),
+          throwsA(isA<DataDoesNotExistException>()),
+        );
+      },
+    );
 
     test('throws HiveDeleteDataException when the delete fails', () async {
       stubCheckData(boxExists: true, keyExists: true);
@@ -342,50 +370,57 @@ void main() {
       );
     });
 
-    test('throws HiveDeleteBoxException when the box cannot be removed',
-        () async {
-      stubCheckData(boxExists: true, keyExists: true);
-      when(() => stringBox.delete(dataKey)).thenAnswer((_) async {});
-      when(stringBox.deleteFromDisk).thenThrow(Exception('read only'));
+    test(
+      'throws HiveDeleteBoxException when the box cannot be removed',
+      () async {
+        stubCheckData(boxExists: true, keyExists: true);
+        when(() => stringBox.delete(dataKey)).thenAnswer((_) async {});
+        when(stringBox.deleteFromDisk).thenThrow(Exception('read only'));
 
-      await expectLater(
-        storage.deleteData<String>(
-          param: ParamDeleteData(boxName: boxName, dataKey: 'token'),
-        ),
-        throwsA(isA<HiveDeleteBoxException>()),
-      );
-    });
+        await expectLater(
+          storage.deleteData<String>(
+            param: ParamDeleteData(boxName: boxName, dataKey: 'token'),
+          ),
+          throwsA(isA<HiveDeleteBoxException>()),
+        );
+      },
+    );
 
-    test('throws FSSDeleteException when the keystore entry cannot be removed',
-        () async {
-      stubCheckData(boxExists: true, keyExists: true, encrypted: true);
-      when(() => stringBox.delete(dataKey)).thenAnswer((_) async {});
-      when(stringBox.deleteFromDisk).thenAnswer((_) async {});
-      when(() => fss.delete(key: any(named: 'key')))
-          .thenThrow(Exception('keystore locked'));
+    test(
+      'throws FSSDeleteException when the keystore entry cannot be removed',
+      () async {
+        stubCheckData(boxExists: true, keyExists: true, encrypted: true);
+        when(() => stringBox.delete(dataKey)).thenAnswer((_) async {});
+        when(stringBox.deleteFromDisk).thenAnswer((_) async {});
+        when(
+          () => fss.delete(key: any(named: 'key')),
+        ).thenThrow(Exception('keystore locked'));
 
-      await expectLater(
-        storage.deleteData<String>(
-          param: ParamDeleteData(boxName: boxName, dataKey: 'token'),
-        ),
-        throwsA(isA<FSSDeleteException>()),
-      );
-    });
+        await expectLater(
+          storage.deleteData<String>(
+            param: ParamDeleteData(boxName: boxName, dataKey: 'token'),
+          ),
+          throwsA(isA<FSSDeleteException>()),
+        );
+      },
+    );
   });
 
   group('opening boxes', () {
-    test('throws FSSReadException when the encryption key is missing',
-        () async {
-      stubCheckData(boxExists: true, keyExists: true, encrypted: true);
-      when(() => fss.read(key: boxName)).thenAnswer((_) async => null);
+    test(
+      'throws FSSReadException when the encryption key is missing',
+      () async {
+        stubCheckData(boxExists: true, keyExists: true, encrypted: true);
+        when(() => fss.read(key: boxName)).thenAnswer((_) async => null);
 
-      await expectLater(
-        storage.getData<String>(
-          param: ParamGetData(boxName: boxName, dataKey: 'token'),
-        ),
-        throwsA(isA<FSSReadException>()),
-      );
-    });
+        await expectLater(
+          storage.getData<String>(
+            param: ParamGetData(boxName: boxName, dataKey: 'token'),
+          ),
+          throwsA(isA<FSSReadException>()),
+        );
+      },
+    );
 
     test('throws FSSReadException when the encryption key is empty', () async {
       stubCheckData(boxExists: true, keyExists: true, encrypted: true);
@@ -399,39 +434,46 @@ void main() {
       );
     });
 
-    test('throws HiveOpenBoxException when hive refuses to open the box',
-        () async {
-      when(() => hive.boxExists(boxName)).thenAnswer((_) async => true);
-      when(() => fss.containsKey(key: boxName)).thenAnswer((_) async => false);
-      when(() => hive.openBox<dynamic>(boxName))
-          .thenThrow(Exception('locked by another isolate'));
+    test(
+      'throws HiveOpenBoxException when hive refuses to open the box',
+      () async {
+        when(() => hive.boxExists(boxName)).thenAnswer((_) async => true);
+        when(
+          () => fss.containsKey(key: boxName),
+        ).thenAnswer((_) async => false);
+        when(
+          () => hive.openBox<dynamic>(boxName),
+        ).thenThrow(Exception('locked by another isolate'));
 
-      await expectLater(
-        storage.isDataExist(
-          param: ParamCheckData(boxName: boxName, dataKey: 'token'),
-        ),
-        throwsA(isA<HiveOpenBoxException>()),
-      );
-    });
+        await expectLater(
+          storage.isDataExist(
+            param: ParamCheckData(boxName: boxName, dataKey: 'token'),
+          ),
+          throwsA(isA<HiveOpenBoxException>()),
+        );
+      },
+    );
 
-    test('throws HiveOpenBoxException when the cipher does not match',
-        () async {
-      when(() => hive.boxExists(boxName)).thenAnswer((_) async => true);
-      when(() => fss.containsKey(key: boxName)).thenAnswer((_) async => true);
-      when(
-        () => hive.openBox<dynamic>(
-          boxName,
-          encryptionCipher: any(named: 'encryptionCipher'),
-        ),
-      ).thenThrow(Exception('wrong key'));
+    test(
+      'throws HiveOpenBoxException when the cipher does not match',
+      () async {
+        when(() => hive.boxExists(boxName)).thenAnswer((_) async => true);
+        when(() => fss.containsKey(key: boxName)).thenAnswer((_) async => true);
+        when(
+          () => hive.openBox<dynamic>(
+            boxName,
+            encryptionCipher: any(named: 'encryptionCipher'),
+          ),
+        ).thenThrow(Exception('wrong key'));
 
-      await expectLater(
-        storage.isDataExist(
-          param: ParamCheckData(boxName: boxName, dataKey: 'token'),
-        ),
-        throwsA(isA<HiveOpenBoxException>()),
-      );
-    });
+        await expectLater(
+          storage.isDataExist(
+            param: ParamCheckData(boxName: boxName, dataKey: 'token'),
+          ),
+          throwsA(isA<HiveOpenBoxException>()),
+        );
+      },
+    );
   });
 
   group('listEncryptedKeys', () {
@@ -463,8 +505,9 @@ void main() {
     setUp(() {
       tempDir = Directory.systemTemp.createTempSync('secure_storage_test');
       for (final name in ['auth.hive', 'profile.hive', 'notes.txt']) {
-        File('${tempDir.path}${Platform.pathSeparator}$name')
-            .writeAsStringSync('');
+        File(
+          '${tempDir.path}${Platform.pathSeparator}$name',
+        ).writeAsStringSync('');
       }
       scanning = SecureStorageImpl(
         hiveInterface: hive,

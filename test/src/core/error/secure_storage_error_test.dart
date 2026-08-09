@@ -36,16 +36,18 @@ void main() {
     for (final entry in cases.entries) {
       final name = entry.key;
       final (exception, expectedFailure) = entry.value;
-      test('$name maps to $expectedFailure carrying prefix, code and message',
-          () {
-        final failure = exception.toFailure();
-        expect(failure.runtimeType, expectedFailure);
-        expect(failure.message, exception.message);
-        if (expectedFailure != UnhandledFailure) {
-          expect(failure.prefix, exception.prefix);
-          expect(failure.code, exception.code);
-        }
-      });
+      test(
+        '$name maps to $expectedFailure carrying prefix, code and message',
+        () {
+          final failure = exception.toFailure();
+          expect(failure.runtimeType, expectedFailure);
+          expect(failure.message, exception.message);
+          if (expectedFailure != UnhandledFailure) {
+            expect(failure.prefix, exception.prefix);
+            expect(failure.code, exception.code);
+          }
+        },
+      );
     }
 
     test('every hive exception carries the HIVE prefix', () {
@@ -102,8 +104,11 @@ void main() {
 
     test('renders as prefix-code: message', () {
       expect(
-        const OpenFailure(prefix: 'HIVE', code: '004', message: 'nope')
-            .toString(),
+        const OpenFailure(
+          prefix: 'HIVE',
+          code: '004',
+          message: 'nope',
+        ).toString(),
         'HIVE-004: nope',
       );
     });
@@ -111,8 +116,10 @@ void main() {
 
   group('AppException', () {
     test('renders as prefix-code: message', () {
-      expect(DataDoesNotExistException().toString(),
-          'SECURE STORAGE-001: Data does not exist.');
+      expect(
+        DataDoesNotExistException().toString(),
+        'SECURE STORAGE-001: Data does not exist.',
+      );
     });
 
     test('accepts an overridden message', () {
