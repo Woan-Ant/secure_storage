@@ -5,7 +5,7 @@ import 'package:secure_storage/src/core/error/app_failure.dart';
 /// {@endtemplate}
 class HiveWriteFailure extends Failure {
   /// {@macro hive_write_failure}
-  const HiveWriteFailure({
+  const new({
     required super.prefix,
     required super.code,
     required super.message,
@@ -22,7 +22,7 @@ class HiveWriteFailure extends Failure {
 /// {@endtemplate}
 class HiveWipeFailure extends Failure {
   /// {@macro hive_wipe_failure}
-  const HiveWipeFailure({
+  const new({
     required super.prefix,
     required super.code,
     required super.message,
@@ -38,7 +38,7 @@ class HiveWipeFailure extends Failure {
 /// {@endtemplate}
 class HiveReadFailure extends Failure {
   /// {@macro hive_read_failure}
-  const HiveReadFailure({
+  const new({
     required super.prefix,
     required super.code,
     required super.message,
@@ -57,7 +57,7 @@ class HiveReadFailure extends Failure {
 /// {@endtemplate}
 class OpenFailure extends Failure {
   /// {@macro open_failure}
-  const OpenFailure({
+  const new({
     required super.prefix,
     required super.code,
     required super.message,
@@ -73,7 +73,7 @@ class OpenFailure extends Failure {
 /// {@endtemplate}
 class CloseFailure extends Failure {
   /// {@macro close_failure}
-  const CloseFailure({
+  const new({
     required super.prefix,
     required super.code,
     required super.message,
@@ -89,7 +89,7 @@ class CloseFailure extends Failure {
 /// {@endtemplate}
 class HiveDeleteBoxFailure extends Failure {
   /// {@macro hive_delete_box_failure}
-  const HiveDeleteBoxFailure({
+  const new({
     required super.prefix,
     required super.code,
     required super.message,
@@ -105,7 +105,7 @@ class HiveDeleteBoxFailure extends Failure {
 /// {@endtemplate}
 class HiveDeleteDataFailure extends Failure {
   /// {@macro hive_delete_data_failure}
-  const HiveDeleteDataFailure({
+  const new({
     required super.prefix,
     required super.code,
     required super.message,
@@ -121,7 +121,7 @@ class HiveDeleteDataFailure extends Failure {
 /// {@endtemplate}
 class HiveBoxNotEmptyFailure extends Failure {
   /// {@macro hive_box_not_empty_failure}
-  const HiveBoxNotEmptyFailure({
+  const new({
     required super.prefix,
     required super.code,
     required super.message,
@@ -137,7 +137,7 @@ class HiveBoxNotEmptyFailure extends Failure {
 /// {@endtemplate}
 class BoxEncryptedFailure extends Failure {
   /// {@macro box_encrypted_failure}
-  const BoxEncryptedFailure({
+  const new({
     required super.prefix,
     required super.code,
     required super.message,
@@ -153,7 +153,7 @@ class BoxEncryptedFailure extends Failure {
 /// {@endtemplate}
 class DataDoesNotExistFailure extends Failure {
   /// {@macro data_does_not_exist_failure}
-  const DataDoesNotExistFailure({
+  const new({
     required super.prefix,
     required super.code,
     required super.message,
@@ -170,7 +170,7 @@ class DataDoesNotExistFailure extends Failure {
 /// {@endtemplate}
 class FSSWriteFailure extends Failure {
   /// {@macro fss_write_failure}
-  const FSSWriteFailure({
+  const new({
     required super.prefix,
     required super.code,
     required super.message,
@@ -187,7 +187,7 @@ class FSSWriteFailure extends Failure {
 /// {@endtemplate}
 class FSSReadFailure extends Failure {
   /// {@macro fss_read_failure}
-  const FSSReadFailure({
+  const new({
     required super.prefix,
     required super.code,
     required super.message,
@@ -204,7 +204,7 @@ class FSSReadFailure extends Failure {
 /// {@endtemplate}
 class FSSNotFoundFailure extends Failure {
   /// {@macro fss_not_found_failure}
-  const FSSNotFoundFailure({
+  const new({
     required super.prefix,
     required super.code,
     required super.message,
@@ -221,7 +221,7 @@ class FSSNotFoundFailure extends Failure {
 /// {@endtemplate}
 class FSSDeleteFailure extends Failure {
   /// {@macro fss_delete_failure}
-  const FSSDeleteFailure({
+  const new({
     required super.prefix,
     required super.code,
     required super.message,

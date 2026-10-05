@@ -2,15 +2,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:secure_storage/secure_storage.dart';
 
-class MockStorageRepository extends Mock implements StorageRepository {}
+class MockStorageRepository extends Mock implements StorageRepository;
 
-class FakeParamCheckData extends Fake implements ParamCheckData {}
+class FakeParamCheckData extends Fake implements ParamCheckData;
 
-class FakeParamGetData extends Fake implements ParamGetData {}
+class FakeParamGetData extends Fake implements ParamGetData;
 
-class FakeParamStoreData extends Fake implements ParamStoreData {}
+class FakeParamStoreData extends Fake implements ParamStoreData;
 
-class FakeParamDeleteData extends Fake implements ParamDeleteData {}
+class FakeParamDeleteData extends Fake implements ParamDeleteData;
 
 /// dartz has no `getLeft()`, so swap the sides and take the resulting Option.
 Failure? leftOf(Either<Failure, dynamic> result) =>
@@ -24,11 +24,7 @@ void main() {
   final storeParam = ParamStoreData(boxName: 'auth', dataKey: 'token');
   final deleteParam = ParamDeleteData(boxName: 'auth', dataKey: 'token');
 
-  const failure = HiveReadFailure(
-    prefix: 'HIVE',
-    code: '003',
-    message: 'nope',
-  );
+  const failure = HiveReadFailure(prefix: 'HIVE', code: '003', message: 'nope');
 
   setUpAll(() {
     registerFallbackValue(FakeParamCheckData());
@@ -41,26 +37,25 @@ void main() {
 
   group('CheckDataUseCase', () {
     test('forwards the param to the repository', () async {
-      when(() => repository.checkData(param: any(named: 'param'))).thenAnswer(
-        (_) async => const Right((exist: true, encrypted: false)),
-      );
+      when(
+        () => repository.checkData(param: any(named: 'param')),
+      ).thenAnswer((_) async => const Right((exist: true, encrypted: false)));
 
-      final result = await CheckDataUseCase(
-        storageRepository: repository,
-      )(param: checkParam);
+      final result = await CheckDataUseCase(storageRepository: repository)(
+        param: checkParam,
+      );
 
       expect(result.isRight(), isTrue);
       verify(() => repository.checkData(param: checkParam)).called(1);
     });
 
     test('passes a failure straight through', () async {
-      when(
-        () => repository.checkData(param: any(named: 'param')),
-      ).thenAnswer((_) async => const Left(failure));
+      when(() => repository.checkData(param: any(named: 'param')))
+          .thenAnswer((_) async => const Left(failure));
 
-      final result = await CheckDataUseCase(
-        storageRepository: repository,
-      )(param: checkParam);
+      final result = await CheckDataUseCase(storageRepository: repository)(
+        param: checkParam,
+      );
 
       expect(leftOf(result), failure);
     });
@@ -68,13 +63,12 @@ void main() {
 
   group('GetDataUseCase', () {
     test('forwards the param to the repository', () async {
-      when(
-        () => repository.getData(param: any(named: 'param')),
-      ).thenAnswer((_) async => const Right<Failure, Object>('value'));
+      when(() => repository.getData(param: any(named: 'param')))
+          .thenAnswer((_) async => const Right<Failure, Object>('value'));
 
-      final result = await GetDataUseCase(
-        storageRepository: repository,
-      )(param: getParam);
+      final result = await GetDataUseCase(storageRepository: repository)(
+        param: getParam,
+      );
 
       expect(result.getOrElse(() => ''), 'value');
       verify(() => repository.getData(param: getParam)).called(1);
@@ -90,26 +84,24 @@ void main() {
         ),
       ).thenAnswer((_) async => const Right<Failure, String>('stored'));
 
-      final result = await StoreDataUseCase(
-        storageRepository: repository,
-      )(param: (data: 'value', param: storeParam));
+      final result = await StoreDataUseCase(storageRepository: repository)(
+        param: (data: 'value', param: storeParam),
+      );
 
       expect(result.getOrElse(() => ''), 'stored');
-      verify(
-        () => repository.storeData(param: storeParam, data: 'value'),
-      ).called(1);
+      verify(() => repository.storeData(param: storeParam, data: 'value'))
+          .called(1);
     });
   });
 
   group('DeleteDataUseCase', () {
     test('forwards the param to the repository', () async {
-      when(
-        () => repository.deleteData(param: any(named: 'param')),
-      ).thenAnswer((_) async => const Right<Failure, String>('deleted'));
+      when(() => repository.deleteData(param: any(named: 'param')))
+          .thenAnswer((_) async => const Right<Failure, String>('deleted'));
 
-      final result = await DeleteDataUseCase(
-        storageRepository: repository,
-      )(param: deleteParam);
+      final result = await DeleteDataUseCase(storageRepository: repository)(
+        param: deleteParam,
+      );
 
       expect(result.getOrElse(() => ''), 'deleted');
       verify(() => repository.deleteData(param: deleteParam)).called(1);
@@ -118,9 +110,8 @@ void main() {
 
   group('ListEncryptedKeysUseCase', () {
     test('needs no param', () async {
-      when(
-        repository.listEncryptedKeys,
-      ).thenAnswer((_) async => const Right({'auth': 'k'}));
+      when(repository.listEncryptedKeys)
+          .thenAnswer((_) async => const Right({'auth': 'k'}));
 
       final result = await ListEncryptedKeysUseCase(
         storageRepository: repository,
@@ -130,9 +121,8 @@ void main() {
     });
 
     test('accepts being invoked twice', () async {
-      when(
-        repository.listEncryptedKeys,
-      ).thenAnswer((_) async => const Right({'auth': 'k'}));
+      when(repository.listEncryptedKeys)
+          .thenAnswer((_) async => const Right({'auth': 'k'}));
 
       final result = await ListEncryptedKeysUseCase(
         storageRepository: repository,
@@ -144,9 +134,8 @@ void main() {
 
   group('ListUnencryptedKeysUseCase', () {
     test('needs no param', () async {
-      when(
-        repository.listUnencryptedKeys,
-      ).thenAnswer((_) async => const Right(['profile']));
+      when(repository.listUnencryptedKeys)
+          .thenAnswer((_) async => const Right(['profile']));
 
       final result = await ListUnencryptedKeysUseCase(
         storageRepository: repository,

@@ -2,15 +2,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:secure_storage/secure_storage.dart';
 
-class MockSecureStorage extends Mock implements SecureStorage {}
+class MockSecureStorage extends Mock implements SecureStorage;
 
-class FakeParamCheckData extends Fake implements ParamCheckData {}
+class FakeParamCheckData extends Fake implements ParamCheckData;
 
-class FakeParamGetData extends Fake implements ParamGetData {}
+class FakeParamGetData extends Fake implements ParamGetData;
 
-class FakeParamStoreData extends Fake implements ParamStoreData {}
+class FakeParamStoreData extends Fake implements ParamStoreData;
 
-class FakeParamDeleteData extends Fake implements ParamDeleteData {}
+class FakeParamDeleteData extends Fake implements ParamDeleteData;
 
 /// dartz has no `getLeft()`, so swap the sides and take the resulting Option.
 Failure? leftOf(Either<Failure, dynamic> result) =>
@@ -39,9 +39,8 @@ void main() {
 
   group('checkData', () {
     test('returns the service result on the right', () async {
-      when(
-        () => service.isDataExist(param: any(named: 'param')),
-      ).thenAnswer((_) async => (exist: true, encrypted: true));
+      when(() => service.isDataExist(param: any(named: 'param')))
+          .thenAnswer((_) async => (exist: true, encrypted: true));
 
       final result = await repository.checkData(param: checkParam);
 
@@ -53,9 +52,8 @@ void main() {
     });
 
     test('converts an AppException into its matching Failure', () async {
-      when(
-        () => service.isDataExist(param: any(named: 'param')),
-      ).thenThrow(HiveOpenBoxException());
+      when(() => service.isDataExist(param: any(named: 'param')))
+          .thenThrow(HiveOpenBoxException());
 
       final result = await repository.checkData(param: checkParam);
 
@@ -67,9 +65,8 @@ void main() {
     });
 
     test('wraps an unmodelled exception in an UnhandledFailure', () async {
-      when(
-        () => service.isDataExist(param: any(named: 'param')),
-      ).thenThrow(const FormatException('bad input'));
+      when(() => service.isDataExist(param: any(named: 'param')))
+          .thenThrow(const FormatException('bad input'));
 
       final result = await repository.checkData(param: checkParam);
 
@@ -110,9 +107,8 @@ void main() {
 
   group('getData', () {
     test('returns the stored value', () async {
-      when(
-        () => service.getData<Object>(param: any(named: 'param')),
-      ).thenAnswer((_) async => 'token-value');
+      when(() => service.getData<Object>(param: any(named: 'param')))
+          .thenAnswer((_) async => 'token-value');
 
       final result = await repository.getData(param: getParam);
 
@@ -120,9 +116,8 @@ void main() {
     });
 
     test('reports a null value as DataDoesNotExistFailure', () async {
-      when(
-        () => service.getData<Object>(param: any(named: 'param')),
-      ).thenAnswer((_) async => null);
+      when(() => service.getData<Object>(param: any(named: 'param')))
+          .thenAnswer((_) async => null);
 
       final result = await repository.getData(param: getParam);
 
@@ -130,9 +125,8 @@ void main() {
     });
 
     test('converts a missing entry', () async {
-      when(
-        () => service.getData<Object>(param: any(named: 'param')),
-      ).thenThrow(DataDoesNotExistException());
+      when(() => service.getData<Object>(param: any(named: 'param')))
+          .thenThrow(DataDoesNotExistException());
 
       final result = await repository.getData(param: getParam);
 
@@ -142,9 +136,8 @@ void main() {
 
   group('deleteData', () {
     test('names the deleted key on success', () async {
-      when(
-        () => service.deleteData<Object>(param: any(named: 'param')),
-      ).thenAnswer((_) async {});
+      when(() => service.deleteData<Object>(param: any(named: 'param')))
+          .thenAnswer((_) async {});
 
       final result = await repository.deleteData(param: deleteParam);
 
@@ -152,9 +145,8 @@ void main() {
     });
 
     test('converts a delete failure', () async {
-      when(
-        () => service.deleteData<Object>(param: any(named: 'param')),
-      ).thenThrow(HiveDeleteBoxException());
+      when(() => service.deleteData<Object>(param: any(named: 'param')))
+          .thenThrow(HiveDeleteBoxException());
 
       final result = await repository.deleteData(param: deleteParam);
 
@@ -180,9 +172,8 @@ void main() {
     });
 
     test('returns the unencrypted box names', () async {
-      when(
-        () => service.listUnencryptedKeys(),
-      ).thenAnswer((_) async => ['profile']);
+      when(() => service.listUnencryptedKeys())
+          .thenAnswer((_) async => ['profile']);
 
       final result = await repository.listUnencryptedKeys();
 

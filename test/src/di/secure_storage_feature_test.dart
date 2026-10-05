@@ -5,10 +5,10 @@ import 'package:hive_ce/hive.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:secure_storage/secure_storage.dart';
 
-class MockFSS extends Mock implements FlutterSecureStorage {}
+class MockFSS extends Mock implements FlutterSecureStorage;
 
 class _Model {
-  const _Model(this.value);
+  const new(this.value);
   final String value;
 }
 

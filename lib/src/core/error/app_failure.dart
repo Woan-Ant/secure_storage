@@ -12,11 +12,7 @@ import 'package:equatable/equatable.dart';
 /// {@endtemplate}
 abstract class Failure extends Equatable {
   /// {@macro failure}
-  const Failure({
-    required this.prefix,
-    required this.code,
-    required this.message,
-  });
+  const new({required this.prefix, required this.code, required this.message});
 
   /// The subsystem that produced this failure, such as `HIVE`.
   final String prefix;
@@ -45,7 +41,7 @@ abstract class Failure extends Equatable {
 /// {@endtemplate}
 class UnhandledFailure extends Failure {
   /// {@macro unhandled_failure}
-  const UnhandledFailure({
+  const new({
     required super.message,
     super.prefix = 'UNHANDLED',
     super.code = '000',

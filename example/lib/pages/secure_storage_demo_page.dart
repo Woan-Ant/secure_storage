@@ -6,7 +6,7 @@ import 'package:secure_storage_example/bloc/demo_storage_bloc.dart';
 /// Exercises every storage operation against a box and key you type in.
 class SecureStorageDemoPage extends StatefulWidget {
   /// Creates a [SecureStorageDemoPage].
-  const SecureStorageDemoPage({super.key});
+  const new({super.key});
 
   /// Route path for this page.
   static const String path = '/secure_storage_demo_page';
@@ -33,9 +33,9 @@ class _SecureStorageDemoPageState extends State<SecureStorageDemoPage> {
     super.dispose();
   }
 
-  void _show(String message) => ScaffoldMessenger.of(
-    context,
-  ).showSnackBar(SnackBar(content: Text(message)));
+  void _show(String message) =>
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
 
   /// Guards against the assertions in [StorageParam], which reject empty or
   /// non-alphanumeric segments in debug builds.
@@ -133,13 +133,11 @@ class _SecureStorageDemoPageState extends State<SecureStorageDemoPage> {
                 child: const Text('delete'),
               ),
               ElevatedButton(
-                onPressed: () =>
-                    _add(const DemoListEncryptedKeysEvent()),
+                onPressed: () => _add(const DemoListEncryptedKeysEvent()),
                 child: const Text('listEncryptedKeys'),
               ),
               ElevatedButton(
-                onPressed: () =>
-                    _add(const DemoListUnencryptedKeysEvent()),
+                onPressed: () => _add(const DemoListUnencryptedKeysEvent()),
                 child: const Text('listUnencryptedKeys'),
               ),
             ],

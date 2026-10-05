@@ -19,7 +19,7 @@ import 'package:secure_storage/src/domain/repositories/storage_repository.dart';
 class StoreDataUseCase
     implements UseCase<String, ({Object data, ParamStoreData param})> {
   /// {@macro store_data_use_case}
-  const StoreDataUseCase({required StorageRepository storageRepository})
+  const new({required StorageRepository storageRepository})
     : _storageRepository = storageRepository;
 
   final StorageRepository _storageRepository;

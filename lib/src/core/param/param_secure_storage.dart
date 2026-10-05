@@ -21,7 +21,7 @@ String _normalize(String value) => value.replaceAll(' ', '_').toLowerCase();
 /// {@endtemplate}
 abstract class StorageParam extends Equatable {
   /// {@macro storage_param}
-  StorageParam({required String boxName, required String dataKey})
+  new({required String boxName, required String dataKey})
     : assert(
         boxName.isNotEmpty && dataKey.isNotEmpty,
         'boxName and dataKey must not be empty',
@@ -52,7 +52,7 @@ abstract class StorageParam extends Equatable {
 /// {@endtemplate}
 class ParamCheckData extends StorageParam {
   /// {@macro param_check_data}
-  ParamCheckData({required super.boxName, required super.dataKey});
+  new({required super.boxName, required super.dataKey});
 }
 
 /// {@template param_get_data}
@@ -60,7 +60,7 @@ class ParamCheckData extends StorageParam {
 /// {@endtemplate}
 class ParamGetData extends StorageParam {
   /// {@macro param_get_data}
-  ParamGetData({required super.boxName, required super.dataKey});
+  new({required super.boxName, required super.dataKey});
 }
 
 /// {@template param_store_data}
@@ -72,11 +72,7 @@ class ParamGetData extends StorageParam {
 /// {@endtemplate}
 class ParamStoreData extends StorageParam {
   /// {@macro param_store_data}
-  ParamStoreData({
-    required super.boxName,
-    required super.dataKey,
-    this.encrypted = false,
-  });
+  new({required super.boxName, required super.dataKey, this.encrypted = false});
 
   /// Whether a newly created box should be AES encrypted.
   final bool encrypted;
@@ -93,5 +89,5 @@ class ParamStoreData extends StorageParam {
 /// {@endtemplate}
 class ParamDeleteData extends StorageParam {
   /// {@macro param_delete_data}
-  ParamDeleteData({required super.boxName, required super.dataKey});
+  new({required super.boxName, required super.dataKey});
 }

@@ -12,7 +12,7 @@ import 'package:secure_storage/src/services/secure_storage.dart';
 /// {@endtemplate}
 class StorageRepositoryImpl implements StorageRepository {
   /// {@macro storage_repository_impl}
-  const StorageRepositoryImpl({required SecureStorage secureStorage})
+  const new({required SecureStorage secureStorage})
     : _secureStorage = secureStorage;
 
   final SecureStorage _secureStorage;

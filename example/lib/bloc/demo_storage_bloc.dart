@@ -14,7 +14,7 @@ part 'demo_storage_state.dart';
 class DemoStorageBloc extends Bloc<DemoStorageEvent, DemoStorageState> {
   /// Creates a [DemoStorageBloc] from the use cases registered by
   /// [initSecureStorageFeature].
-  DemoStorageBloc({
+  new({
     required CheckDataUseCase checkDataUseCase,
     required StoreDataUseCase storeDataUseCase,
     required GetDataUseCase getDataUseCase,

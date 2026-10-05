@@ -20,7 +20,7 @@ import 'package:flutter/foundation.dart';
 /// {@endtemplate}
 abstract class SecureStorageLogger {
   /// {@macro secure_storage_logger}
-  const SecureStorageLogger();
+  const new();
 
   /// Logs a debug message describing an internal step.
   void d(String message);
@@ -42,7 +42,7 @@ abstract class SecureStorageLogger {
 /// {@endtemplate}
 class SilentSecureStorageLogger extends SecureStorageLogger {
   /// {@macro silent_secure_storage_logger}
-  const SilentSecureStorageLogger();
+  const new();
 
   @override
   void d(String message) {}
@@ -62,7 +62,7 @@ class SilentSecureStorageLogger extends SecureStorageLogger {
 /// {@endtemplate}
 class DebugPrintSecureStorageLogger extends SecureStorageLogger {
   /// {@macro debug_print_secure_storage_logger}
-  const DebugPrintSecureStorageLogger();
+  const new();
 
   void _log(String level, String message) {
     if (kDebugMode) {

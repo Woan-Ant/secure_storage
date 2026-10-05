@@ -9,7 +9,7 @@ import 'package:secure_storage/src/core/error/app_failure.dart';
 /// {@endtemplate}
 abstract class AppException implements Exception {
   /// {@macro app_exception}
-  AppException({
+  new({
     this.prefix = 'APP',
     this.code = '000',
     this.message = 'An unexpected error occurred.',
@@ -37,11 +37,7 @@ abstract class AppException implements Exception {
 /// {@endtemplate}
 class UnhandledException extends AppException {
   /// {@macro unhandled_exception}
-  UnhandledException({
-    super.prefix = 'UNHANDLED',
-    super.code = '000',
-    super.message,
-  });
+  new({super.prefix = 'UNHANDLED', super.code = '000', super.message});
 
   @override
   Failure toFailure() => UnhandledFailure(message: message);

@@ -11,7 +11,7 @@ const String _prefixSS = 'SECURE STORAGE';
 /// {@endtemplate}
 class HiveWriteException extends AppException {
   /// {@macro hive_write_exception}
-  HiveWriteException({
+  new({
     super.prefix = _prefixHive,
     super.code = '001',
     super.message = 'Error while storing/writing data in Hive.',
@@ -28,7 +28,7 @@ class HiveWriteException extends AppException {
 /// {@endtemplate}
 class HiveWipeException extends AppException {
   /// {@macro hive_wipe_exception}
-  HiveWipeException({
+  new({
     super.prefix = _prefixHive,
     super.code = '002',
     super.message = 'Data already wiped from Hive.',
@@ -44,7 +44,7 @@ class HiveWipeException extends AppException {
 /// {@endtemplate}
 class HiveReadException extends AppException {
   /// {@macro hive_read_exception}
-  HiveReadException({
+  new({
     super.prefix = _prefixHive,
     super.code = '003',
     super.message = 'Error while reading data from Hive.',
@@ -60,7 +60,7 @@ class HiveReadException extends AppException {
 /// {@endtemplate}
 class HiveOpenBoxException extends AppException {
   /// {@macro hive_open_box_exception}
-  HiveOpenBoxException({
+  new({
     super.prefix = _prefixHive,
     super.code = '004',
     super.message = 'Error while opening hive box.',
@@ -76,7 +76,7 @@ class HiveOpenBoxException extends AppException {
 /// {@endtemplate}
 class HiveCloseBoxException extends AppException {
   /// {@macro hive_close_box_exception}
-  HiveCloseBoxException({
+  new({
     super.prefix = _prefixHive,
     super.code = '005',
     super.message = 'Error while closing hive box.',
@@ -92,7 +92,7 @@ class HiveCloseBoxException extends AppException {
 /// {@endtemplate}
 class HiveDeleteBoxException extends AppException {
   /// {@macro hive_delete_box_exception}
-  HiveDeleteBoxException({
+  new({
     super.prefix = _prefixHive,
     super.code = '006',
     super.message = 'Error while deleting hive box from disk.',
@@ -108,7 +108,7 @@ class HiveDeleteBoxException extends AppException {
 /// {@endtemplate}
 class HiveDeleteDataException extends AppException {
   /// {@macro hive_delete_data_exception}
-  HiveDeleteDataException({
+  new({
     super.prefix = _prefixHive,
     super.code = '007',
     super.message = 'Error while deleting hive data from disk.',
@@ -124,7 +124,7 @@ class HiveDeleteDataException extends AppException {
 /// {@endtemplate}
 class HiveBoxNotEmptyException extends AppException {
   /// {@macro hive_box_not_empty_exception}
-  HiveBoxNotEmptyException({
+  new({
     super.prefix = _prefixHive,
     super.code = '008',
     super.message = 'Box is not empty.',
@@ -140,11 +140,10 @@ class HiveBoxNotEmptyException extends AppException {
 /// {@endtemplate}
 class BoxEncryptedException extends AppException {
   /// {@macro box_encrypted_exception}
-  BoxEncryptedException({
+  new({
     super.prefix = _prefixHive,
     super.code = '009',
-    super.message =
-        '''The box already exists and is encrypted. It cannot be opened without the correct encryption key. Attempting to open it without the key could corrupt the box and result in the loss of all data within it.''',
+    super.message = '''The box already exists and is encrypted. It cannot be opened without the correct encryption key. Attempting to open it without the key could corrupt the box and result in the loss of all data within it.''',
   });
 
   @override
@@ -158,7 +157,7 @@ class BoxEncryptedException extends AppException {
 /// {@endtemplate}
 class DataDoesNotExistException extends AppException {
   /// {@macro data_does_not_exist_exception}
-  DataDoesNotExistException({
+  new({
     super.prefix = _prefixSS,
     super.code = '001',
     super.message = 'Data does not exist.',
@@ -174,7 +173,7 @@ class DataDoesNotExistException extends AppException {
 /// {@endtemplate}
 class FSSWriteException extends AppException {
   /// {@macro fss_write_exception}
-  FSSWriteException({
+  new({
     super.prefix = _prefixFSS,
     super.code = '001',
     super.message =
@@ -191,7 +190,7 @@ class FSSWriteException extends AppException {
 /// {@endtemplate}
 class FSSReadException extends AppException {
   /// {@macro fss_read_exception}
-  FSSReadException({
+  new({
     super.prefix = _prefixFSS,
     super.code = '002',
     super.message =
@@ -208,7 +207,7 @@ class FSSReadException extends AppException {
 /// {@endtemplate}
 class FSSNotFoundException extends AppException {
   /// {@macro fss_not_found_exception}
-  FSSNotFoundException({
+  new({
     super.prefix = _prefixFSS,
     super.code = '003',
     super.message = 'There is no data found in the device.',
@@ -224,7 +223,7 @@ class FSSNotFoundException extends AppException {
 /// {@endtemplate}
 class FSSDeleteException extends AppException {
   /// {@macro fss_delete_exception}
-  FSSDeleteException({
+  new({
     super.prefix = _prefixFSS,
     super.code = '004',
     super.message = 'Unable to delete data from Flutter Secure Storage.',

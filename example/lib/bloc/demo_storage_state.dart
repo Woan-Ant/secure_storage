@@ -2,7 +2,7 @@ part of 'demo_storage_bloc.dart';
 
 /// Base type for every state the demo page renders.
 sealed class DemoStorageState extends Equatable {
-  const DemoStorageState();
+  const new();
 
   @override
   List<Object?> get props => [];
@@ -11,19 +11,19 @@ sealed class DemoStorageState extends Equatable {
 /// Nothing has been asked of storage yet.
 final class DemoStorageInitial extends DemoStorageState {
   /// Creates a [DemoStorageInitial].
-  const DemoStorageInitial();
+  const new();
 }
 
 /// An operation is in flight.
 final class DemoStorageLoading extends DemoStorageState {
   /// Creates a [DemoStorageLoading].
-  const DemoStorageLoading();
+  const new();
 }
 
 /// The existence check completed.
 final class DemoCheckDataSuccess extends DemoStorageState {
   /// Creates a [DemoCheckDataSuccess].
-  const DemoCheckDataSuccess({required this.checker});
+  const new({required this.checker});
 
   /// Whether the entry exists, and whether its box is encrypted.
   final ({bool exist, bool? encrypted}) checker;
@@ -35,7 +35,7 @@ final class DemoCheckDataSuccess extends DemoStorageState {
 /// A value was written.
 final class DemoStoreDataSuccess extends DemoStorageState {
   /// Creates a [DemoStoreDataSuccess].
-  const DemoStoreDataSuccess({required this.message});
+  const new({required this.message});
 
   /// Confirmation text from the repository.
   final String message;
@@ -47,7 +47,7 @@ final class DemoStoreDataSuccess extends DemoStorageState {
 /// A value was read.
 final class DemoGetDataSuccess extends DemoStorageState {
   /// Creates a [DemoGetDataSuccess].
-  const DemoGetDataSuccess({required this.data});
+  const new({required this.data});
 
   /// The value that was stored.
   final Object data;
@@ -59,7 +59,7 @@ final class DemoGetDataSuccess extends DemoStorageState {
 /// A value was deleted.
 final class DemoDeleteDataSuccess extends DemoStorageState {
   /// Creates a [DemoDeleteDataSuccess].
-  const DemoDeleteDataSuccess({required this.message});
+  const new({required this.message});
 
   /// Confirmation text from the repository.
   final String message;
@@ -71,7 +71,7 @@ final class DemoDeleteDataSuccess extends DemoStorageState {
 /// The encrypted box names were listed.
 final class DemoListEncryptedKeysSuccess extends DemoStorageState {
   /// Creates a [DemoListEncryptedKeysSuccess].
-  const DemoListEncryptedKeysSuccess({required this.keys});
+  const new({required this.keys});
 
   /// Box name to stored encryption key. Never render these values.
   final Map<String, String> keys;
@@ -83,7 +83,7 @@ final class DemoListEncryptedKeysSuccess extends DemoStorageState {
 /// The unencrypted box names were listed.
 final class DemoListUnencryptedKeysSuccess extends DemoStorageState {
   /// Creates a [DemoListUnencryptedKeysSuccess].
-  const DemoListUnencryptedKeysSuccess({required this.keys});
+  const new({required this.keys});
 
   /// Names of the boxes on disk with no encryption key.
   final List<dynamic> keys;
@@ -98,7 +98,7 @@ final class DemoStorageError extends DemoStorageState {
   ///
   /// Takes [failure] positionally so it can be used as a tear-off when folding
   /// an `Either`.
-  const DemoStorageError(this.failure);
+  const new(this.failure);
 
   /// What went wrong.
   final Failure failure;

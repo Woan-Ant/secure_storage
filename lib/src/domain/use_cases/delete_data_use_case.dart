@@ -10,7 +10,7 @@ import 'package:secure_storage/src/domain/repositories/storage_repository.dart';
 /// {@endtemplate}
 class DeleteDataUseCase implements UseCase<String, ParamDeleteData> {
   /// {@macro delete_data_use_case}
-  const DeleteDataUseCase({required StorageRepository storageRepository})
+  const new({required StorageRepository storageRepository})
     : _storageRepository = storageRepository;
 
   final StorageRepository _storageRepository;

@@ -23,7 +23,7 @@ import 'package:synchronized/synchronized.dart';
 /// {@endtemplate}
 class SecureStorageImpl implements SecureStorage {
   /// {@macro secure_storage_impl}
-  SecureStorageImpl({
+  new({
     required HiveInterface hiveInterface,
     required FlutterSecureStorage fSS,
     String? boxDirectoryPath,
@@ -152,7 +152,7 @@ class SecureStorageImpl implements SecureStorage {
   Future<({bool exist, bool? encrypted})> isDataExist({
     required ParamCheckData param,
   }) async {
-    return _lock.synchronized(
+    return await _lock.synchronized(
       () => _checkData(boxName: param.boxName, dataKey: param.dataKey),
     );
   }
@@ -196,7 +196,7 @@ class SecureStorageImpl implements SecureStorage {
 
   @override
   Future<T?> getData<T>({required ParamGetData param}) async {
-    return _lock.synchronized(() async {
+    return await _lock.synchronized(() async {
       _logger.d(
         '''[getData] => param: 📦 box: [${param.boxName}] & 🔑 dataKey: [${param.dataKey}]''',
       );
@@ -215,7 +215,7 @@ class SecureStorageImpl implements SecureStorage {
         dataKey: param.dataKey,
         encrypted: dataChecker.encrypted!,
       );
-      return _getData<T>(dataKey: param.dataKey, box: box);
+      return await _getData<T>(dataKey: param.dataKey, box: box);
     });
   }
 

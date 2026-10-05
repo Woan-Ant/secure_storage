@@ -10,9 +10,8 @@ import 'package:secure_storage/src/domain/repositories/storage_repository.dart';
 /// {@endtemplate}
 class ListUnencryptedKeysUseCase implements UseCase<List<dynamic>, Param> {
   /// {@macro list_unencrypted_keys_use_case}
-  const ListUnencryptedKeysUseCase({
-    required StorageRepository storageRepository,
-  }) : _storageRepository = storageRepository;
+  const new({required StorageRepository storageRepository})
+    : _storageRepository = storageRepository;
 
   final StorageRepository _storageRepository;
 

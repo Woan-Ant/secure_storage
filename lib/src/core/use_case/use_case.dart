@@ -11,7 +11,6 @@ import 'package:secure_storage/src/core/error/app_failure.dart';
 /// {@endtemplate}
 // This is an interface implemented by every use case, not a helper waiting to
 // become a function.
-// ignore: one_member_abstracts
 abstract class UseCase<T, P> {
   /// {@macro use_case}
   Future<Either<Failure, T>> call({required P param});
@@ -22,7 +21,7 @@ abstract class UseCase<T, P> {
 /// {@endtemplate}
 abstract class Param extends Equatable {
   /// {@macro param}
-  const Param();
+  const new();
 
   @override
   List<Object?> get props => [];
@@ -34,5 +33,5 @@ abstract class Param extends Equatable {
 /// {@endtemplate}
 class NoParam extends Param {
   /// {@macro no_param}
-  const NoParam();
+  const new();
 }

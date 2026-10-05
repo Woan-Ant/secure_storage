@@ -9,7 +9,7 @@ import 'package:secure_storage/src/domain/repositories/storage_repository.dart';
 /// {@endtemplate}
 class GetDataUseCase implements UseCase<Object, ParamGetData> {
   /// {@macro get_data_use_case}
-  const GetDataUseCase({required StorageRepository storageRepository})
+  const new({required StorageRepository storageRepository})
     : _storageRepository = storageRepository;
 
   final StorageRepository _storageRepository;

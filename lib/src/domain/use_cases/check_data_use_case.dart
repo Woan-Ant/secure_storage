@@ -10,7 +10,7 @@ import 'package:secure_storage/src/domain/repositories/storage_repository.dart';
 class CheckDataUseCase
     implements UseCase<({bool exist, bool? encrypted}), ParamCheckData> {
   /// {@macro check_data_use_case}
-  const CheckDataUseCase({required StorageRepository storageRepository})
+  const new({required StorageRepository storageRepository})
     : _storageRepository = storageRepository;
 
   final StorageRepository _storageRepository;

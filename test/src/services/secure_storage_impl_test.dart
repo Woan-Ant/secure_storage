@@ -8,13 +8,13 @@ import 'package:hive_ce/hive.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:secure_storage/secure_storage.dart';
 
-class MockHive extends Mock implements HiveInterface {}
+class MockHive extends Mock implements HiveInterface;
 
-class MockFSS extends Mock implements FlutterSecureStorage {}
+class MockFSS extends Mock implements FlutterSecureStorage;
 
-class MockBox<T> extends Mock implements Box<T> {}
+class MockBox<T> extends Mock implements Box<T>;
 
-class FakeHiveCipher extends Fake implements HiveCipher {}
+class FakeHiveCipher extends Fake implements HiveCipher;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -55,9 +55,8 @@ void main() {
       ),
     ).thenAnswer((_) async {});
     when(() => fss.delete(key: any(named: 'key'))).thenAnswer((_) async {});
-    when(
-      () => fss.read(key: any(named: 'key')),
-    ).thenAnswer((_) async => encodedKey);
+    when(() => fss.read(key: any(named: 'key')))
+        .thenAnswer((_) async => encodedKey);
   });
 
   /// Stubs the box-exists / key-exists probe that every operation starts with.
@@ -67,9 +66,8 @@ void main() {
     bool encrypted = false,
   }) {
     when(() => hive.boxExists(boxName)).thenAnswer((_) async => boxExists);
-    when(
-      () => fss.containsKey(key: boxName),
-    ).thenAnswer((_) async => encrypted);
+    when(() => fss.containsKey(key: boxName))
+        .thenAnswer((_) async => encrypted);
     when(() => dynamicBox.containsKey(dataKey)).thenReturn(keyExists);
     if (encrypted) {
       when(
@@ -85,12 +83,10 @@ void main() {
         ),
       ).thenAnswer((_) async => stringBox);
     } else {
-      when(
-        () => hive.openBox<dynamic>(boxName),
-      ).thenAnswer((_) async => dynamicBox);
-      when(
-        () => hive.openBox<String>(boxName),
-      ).thenAnswer((_) async => stringBox);
+      when(() => hive.openBox<dynamic>(boxName))
+          .thenAnswer((_) async => dynamicBox);
+      when(() => hive.openBox<String>(boxName))
+          .thenAnswer((_) async => stringBox);
     }
   }
 
@@ -234,9 +230,8 @@ void main() {
       'throws HiveWriteException and still closes the box on put failure',
       () async {
         stubCheckData(boxExists: true, keyExists: true);
-        when(
-          () => stringBox.put(dataKey, 'value'),
-        ).thenThrow(Exception('disk full'));
+        when(() => stringBox.put(dataKey, 'value'))
+            .thenThrow(Exception('disk full'));
 
         await expectLater(
           storage.storeData<String>(
@@ -392,9 +387,8 @@ void main() {
         stubCheckData(boxExists: true, keyExists: true, encrypted: true);
         when(() => stringBox.delete(dataKey)).thenAnswer((_) async {});
         when(stringBox.deleteFromDisk).thenAnswer((_) async {});
-        when(
-          () => fss.delete(key: any(named: 'key')),
-        ).thenThrow(Exception('keystore locked'));
+        when(() => fss.delete(key: any(named: 'key')))
+            .thenThrow(Exception('keystore locked'));
 
         await expectLater(
           storage.deleteData<String>(
@@ -440,9 +434,8 @@ void main() {
         // Reproduces desktop Linux with no Secret Service running: the plugin
         // throws from containsKey, and it must not escape untyped.
         when(() => hive.boxExists(boxName)).thenAnswer((_) async => true);
-        when(
-          () => fss.containsKey(key: boxName),
-        ).thenThrow(Exception('Libsecret error: name is not activatable'));
+        when(() => fss.containsKey(key: boxName))
+            .thenThrow(Exception('Libsecret error: name is not activatable'));
 
         await expectLater(
           storage.isDataExist(
@@ -457,12 +450,10 @@ void main() {
       'throws HiveOpenBoxException when hive refuses to open the box',
       () async {
         when(() => hive.boxExists(boxName)).thenAnswer((_) async => true);
-        when(
-          () => fss.containsKey(key: boxName),
-        ).thenAnswer((_) async => false);
-        when(
-          () => hive.openBox<dynamic>(boxName),
-        ).thenThrow(Exception('locked by another isolate'));
+        when(() => fss.containsKey(key: boxName))
+            .thenAnswer((_) async => false);
+        when(() => hive.openBox<dynamic>(boxName))
+            .thenThrow(Exception('locked by another isolate'));
 
         await expectLater(
           storage.isDataExist(
@@ -497,14 +488,13 @@ void main() {
 
   group('listEncryptedKeys', () {
     test('returns everything held in the keystore', () async {
-      when(
-        fss.readAll,
-      ).thenAnswer((_) async => {'auth': 'k1', 'profile': 'k2'});
+      when(fss.readAll)
+          .thenAnswer((_) async => {'auth': 'k1', 'profile': 'k2'});
 
-      expect(
-        await storage.listEncryptedKeys(),
-        {'auth': 'k1', 'profile': 'k2'},
-      );
+      expect(await storage.listEncryptedKeys(), {
+        'auth': 'k1',
+        'profile': 'k2',
+      });
     });
 
     test('throws FSSReadException when the keystore cannot be read', () async {
@@ -524,9 +514,8 @@ void main() {
     setUp(() {
       tempDir = Directory.systemTemp.createTempSync('secure_storage_test');
       for (final name in ['auth.hive', 'profile.hive', 'notes.txt']) {
-        File(
-          '${tempDir.path}${Platform.pathSeparator}$name',
-        ).writeAsStringSync('');
+        File('${tempDir.path}${Platform.pathSeparator}$name')
+            .writeAsStringSync('');
       }
       scanning = SecureStorageImpl(
         hiveInterface: hive,
@@ -630,7 +619,7 @@ void main() {
 }
 
 class _RecordingLogger extends SecureStorageLogger {
-  const _RecordingLogger(this.messages);
+  const new(this.messages);
 
   final List<String> messages;
 

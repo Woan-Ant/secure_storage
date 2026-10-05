@@ -38,16 +38,13 @@ Future<void> main() async {
 /// Demo application for the `secure_storage` package.
 class SecureStorageExampleApp extends StatelessWidget {
   /// Creates a [SecureStorageExampleApp].
-  const SecureStorageExampleApp({super.key});
+  const new({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Secure Storage Example',
-      theme: ThemeData(
-        colorSchemeSeed: Colors.indigo,
-        useMaterial3: true,
-      ),
+      theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
       home: BlocProvider(
         create: (_) => DemoStorageBloc(
           checkDataUseCase: sl<CheckDataUseCase>(),
